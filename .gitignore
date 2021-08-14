@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Config file
-.user_config.yaml 
+user_config.yaml
