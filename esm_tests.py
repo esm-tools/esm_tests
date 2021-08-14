@@ -3,6 +3,9 @@ import subprocess
 import argparse
 import math
 import yaml
+import re
+from loguru import logger
+from esm_runscripts import color_diff
 
 
 def user_config():
@@ -67,18 +70,53 @@ def read_info_from_rs(scripts_info):
     return scripts_info
 
 
+def sh(inp_str):
+    p = subprocess.Popen(inp_str.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out = p.communicate()[0].decode('utf-8')
+    return out
+
+
 def comp_test(scripts_info, actually_compile):
+    cd_format = re.compile("         cd (.*)")
+
     for model, scripts in scripts_info.items():
         for script, v in scripts.items():
-            # Change directory v["path"]
-            if actually_compile:
-                get_command = f"esm_master get-{model}-{v['version']}"
-                # run command
-                check = ""
+            version = v["version"]
+            comp_command = f"esm_master comp-{model}-{version}"
+            if not os.path.isdir(f"{user_info['test_dir']}/comp/{model}"):
+                os.makedirs(f"{user_info['test_dir']}/comp/{model}")
+            os.chdir(f"{user_info['test_dir']}/comp/{model}")
+
+            if os.path.isdir(f"{user_info['test_dir']}/comp/{model}/{model}-{version}"):
+                v["state"] = "Directory already exists"
             else:
-                check = "-c"
-            comp_command = f"esm_master comp-{model}-{v['version']} {check}"
-            # run command
+                if actually_compile:
+                    get_command = f"esm_master get-{model}-{version}"
+                    sh(get_command)
+                else:
+                    # Evaluate and create folders to cheat esm_master
+                    out = sh(f"{comp_command} -c")
+                    folders = []
+                    for line in out.split("\n"):
+                        if "cd" in line and "cd .." not in line:
+                            found_format = cd_format.findall(line)
+                            if len(found_format) > 0:
+                                if ";" not in found_format[0] and "/" not in found_format[0]:
+                                    folders.append(found_format[0])
+                    if len(folders)==0:
+                        logger.warning(f'NOT TESTING {model + version}: "cd" command not found')
+                        continue
+                    prim_f = folders[0]
+                    folders.append(f"{model}-{version}")
+                    folders = [x for x in set(folders)]
+                    if os.path.isdir(prim_f):
+                        shutil.move(prim_f, prim_f + "_bckp")
+                    os.mkdir(prim_f)
+                    for folder in folders:
+                        os.mkdir(prim_f + "/" + folder)
+            out = sh(comp_command)
+
+    return scripts_info
 
 
 def run_test(scripts_info, actually_run):
@@ -123,6 +161,7 @@ actually_run = args["run"]
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 runscripts_dir = f"{script_dir}/runscripts/"
+current_dir = os.getcwd()
 
 # Predefined for later
 user_scripts = dict(comp={}, run={})
@@ -134,9 +173,9 @@ if not ignore_user_info:
 else:
     user_info = None
 
-print(user_info)
-print(actually_compile)
-print(actually_run)
+logger.debug(f"User info: {user_info}")
+logger.debug(f"Actually compile: {actually_compile}")
+logger.debug(f"Actually run: {actually_run}")
 
 
 # Gather scripts
@@ -146,6 +185,7 @@ scripts_info = get_scripts()
 
 # Complete scripts_info
 scripts_info = read_info_from_rs(scripts_info)
+
 
 # Compile
 comp_test(scripts_info, actually_compile)
