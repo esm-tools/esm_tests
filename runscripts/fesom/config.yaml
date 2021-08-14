@@ -1,0 +1,6 @@
+comp:
+        actual:
+                check_files:
+                    - "bin/fesom.x"
+        check:
+                comp: all
