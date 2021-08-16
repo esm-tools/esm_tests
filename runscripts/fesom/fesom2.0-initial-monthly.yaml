@@ -1,20 +1,17 @@
 general:
+        account: !ENV ${ACCOUNT}
         setup_name: fesom
         compute_time: "00:08:00"
         initial_date: '2001-01-01'
         final_date: '2001-03-31'
-        base_dir: "!ENV ${ESM_TESTING_DIR}"
+        base_dir: !ENV ${ESM_TESTING_DIR}
         nyear: 0
         nmonth: 1
         use_venv: False
 
 fesom:
         version: 2.0
-        model_dir: "!ENV ${MODEL_DIR}"
-        choose_computer.name:
-            ollie:
-                pool_dir: "/work/ollie/pool/FESOM/"
-                mesh_dir: "/work/ollie/pool/FESOM/fesom2.0/meshes/mesh_CORE2_final/"
+        model_dir: !ENV ${MODEL_DIR}
         res: CORE2
         lresume: 0
         restart_rate: 1

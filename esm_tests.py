@@ -6,7 +6,10 @@ import math
 import yaml
 import re
 import shutil
+
 from loguru import logger
+
+import esm_parser
 from esm_runscripts import color_diff
 
 
@@ -56,8 +59,8 @@ def get_scripts():
         scripts_info[model] = {}
         for script in os.listdir(f"{runscripts_dir}/{model}"):
             if script != "config.yaml" and ".swp" not in script:
-                scripts_info[model][script.rstrip(".yaml")] = {}
-                scripts_info[model][script.rstrip(".yaml")][
+                scripts_info[model][script.replace(".yaml", "")] = {}
+                scripts_info[model][script.replace(".yaml", "")][
                     "path"
                 ] = f"{runscripts_dir}/{model}/{script}"
                 ns += 1
@@ -66,20 +69,34 @@ def get_scripts():
 
 
 def read_info_from_rs(scripts_info):
+    new_loader = create_env_loader()
     for model, scripts in scripts_info.items():
         if model == "general":
             continue
         for script, v in scripts.items():
+            #runscript = esm_parser.yaml_file_to_dict(v["path"])
             with open(v["path"], "r") as rs:
-                runscript = yaml.load(rs, Loader=yaml.FullLoader)
+                runscript = yaml.load(rs, Loader=yaml.SafeLoader)
             v["version"] = runscript[model]["version"]
 
     return scripts_info
 
 
-def sh(inp_str):
+def create_env_loader(tag="!ENV", loader=yaml.SafeLoader):
+    # Necessary to ignore !ENV variables
+    def constructor_env_variables(loader, node):
+        return ""
+    loader.add_constructor(tag, constructor_env_variables)
+    return loader
+
+
+def sh(inp_str, env_vars=[]):
+    ev = ""
+    for v in env_vars:
+        ev += f"export {v}; "
+    inp_str = f"{ev}{inp_str}"
     p = subprocess.Popen(
-        inp_str.split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        inp_str, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
     )
     out = p.communicate()[0].decode("utf-8")
     return out
@@ -209,24 +226,41 @@ def exist_files(files, path):
 
 
 def run_test(scripts_info, actually_run):
+    c = 0
     # Loop through tests
     for model, scripts in scripts_info.items():
         if model == "general":
             continue
         for script, v in scripts.items():
-            if actually_compile:
+            c += 1
+            progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
+            version = v["version"]
+            runscript_path = v["path"]
+            test_name = os.path.basename(runscript_path.replace(".yaml", ""))
+            run_command = f"esm_master comp-{model}-{version} --no-motd"
+            general_run_dir = f"{user_info['test_dir']}/run/{model}/"
+            run_dir = f"{user_info['test_dir']}/run/{model}/{test_name}"
+            model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
+            logger.info(f"\tSUBMITTING ({progress}%) {model}/{test_name}:")
+            if not os.path.isdir(general_run_dir):
+                os.makedirs(general_run_dir)
+            os.chdir(os.path.dirname(runscript_path))
+            print(os.getcwd())
+
+            if actually_run:
                 check = ""
             else:
                 check = "-c"
             # Export test variables
-            export_vars = [
-                f"ESM_TESTING_DIR={user_info['test_dir']}/{model}/",
-                f"MODEL_DIR=something",
+            env_vars = [
+                f"ACCOUNT=\'{user_info['account']}\'",
+                f"ESM_TESTING_DIR='{general_run_dir}'",
+                f"MODEL_DIR='{model_dir}'",
             ]
-            for var in export_vars:
-                print(var)
+            # TODO: check if directory exists!!!!!
             run_command = f"esm_runscripts {v['path']} -e {script} --open-run {check}"
-            print(run_command)
+            out = sh(run_command, env_vars)
+            print(out)
 
 
 # Parsing
@@ -266,7 +300,6 @@ current_dir = os.getcwd()
 # Predefined for later
 user_scripts = dict(comp={}, run={})
 
-
 # Get user info for testing
 if not ignore_user_info:
     user_info = user_config()
@@ -298,7 +331,7 @@ scripts_info = read_info_from_rs(scripts_info)
 comp_test(scripts_info, actually_compile)
 
 # Run
-run_test(scripts_info, actually_compile)
+run_test(scripts_info, actually_run)
 
 
 yprint(scripts_info)
