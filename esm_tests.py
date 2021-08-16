@@ -51,6 +51,7 @@ def yprint(pdict):
 
 def get_scripts():
     scripts_info = {}
+    ns = 0
     for model in os.listdir(runscripts_dir):
         scripts_info[model] = {}
         for script in os.listdir(f"{runscripts_dir}/{model}"):
@@ -59,12 +60,15 @@ def get_scripts():
                 scripts_info[model][script.rstrip(".yaml")][
                     "path"
                 ] = f"{runscripts_dir}/{model}/{script}"
-
+                ns += 1
+    scripts_info["general"] = {"num_scripts": ns}
     return scripts_info
 
 
 def read_info_from_rs(scripts_info):
     for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
         for script, v in scripts.items():
             with open(v["path"], "r") as rs:
                 runscript = yaml.load(rs, Loader=yaml.FullLoader)
@@ -75,7 +79,7 @@ def read_info_from_rs(scripts_info):
 
 def sh(inp_str):
     p = subprocess.Popen(
-        inp_str.split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        inp_str.split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
     out = p.communicate()[0].decode("utf-8")
     return out
@@ -84,27 +88,35 @@ def sh(inp_str):
 def comp_test(scripts_info, actually_compile):
     cd_format = re.compile("         cd (.*)")
 
+    c = 0
     for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
         for script, v in scripts.items():
+            c += 1
+            progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
-            comp_command = f"esm_master comp-{model}-{version}"
-            logger.info(f"\tCOMPILING {model}-{version}:")
-            if not os.path.isdir(f"{user_info['test_dir']}/comp/{model}"):
-                os.makedirs(f"{user_info['test_dir']}/comp/{model}")
-            os.chdir(f"{user_info['test_dir']}/comp/{model}")
+            comp_command = f"esm_master comp-{model}-{version} --no-motd"
+            general_model_dir = f"{user_info['test_dir']}/comp/{model}"
+            model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
+            logger.info(f"\tCOMPILING ({progress}%) {model}-{version}:")
+            if not os.path.isdir(general_model_dir):
+                os.makedirs(general_model_dir)
+            os.chdir(general_model_dir)
 
-            if os.path.isdir(f"{user_info['test_dir']}/comp/{model}/{model}-{version}"):
+            if os.path.isdir(model_dir):
                 v["state"] = "Directory already exists"
                 logger.info(f"\t\tDirectory already exists, skipping")
+                out = ""
             else:
                 # Gets the source code if actual compilation is required
                 if actually_compile:
-                    get_command = f"esm_master get-{model}-{version}"
+                    get_command = f"esm_master get-{model}-{version} --no-motd"
                     logger.info("\t\tDownloading")
                     out = sh(get_command)
                 # For no compilation trick esm_master into thinking that the source code has been downloaded
                 else:
-                    # Evaluate and create folders to cheat esm_master
+                    # Evaluate and create folders to trick esm_master
                     out = sh(f"{comp_command} -c")
                     folders = []
                     for line in out.split("\n"):
@@ -128,16 +140,30 @@ def comp_test(scripts_info, actually_compile):
                     for folder in folders:
                         os.mkdir(prim_f + "/" + folder)
 
-            # Compile
-            if actually_compile:
-                logger.info("\t\tCompiling")
-            else:
-                logger.info("\t\tWritting compilation scripts")
-            out = sh(comp_command)
+                # Compile
+                if actually_compile:
+                    logger.info("\t\tCompiling")
+                else:
+                    logger.info("\t\tWritting compilation scripts")
+                out = sh(comp_command)
+
+                # Write output file
+                with open(f"{model_dir}/comp.out", "w") as o:
+                    o.write(out)
+
+                # Move and cleanup files
+                if not actually_compile:
+                    for f in os.listdir(general_model_dir):
+                        if "comp-" in f:
+                            shutil.move(f"{general_model_dir}/{f}", model_dir)
+                        if f == "dummy_script.sh":
+                            os.remove(f"{general_model_dir}/{f}")
 
             # Checks
             success = check("comp", model, version, out, script, v)
-            print("Success: ", success)
+            if success:
+                logger.info("\t\tSuccess!")
+                v["state"] = "success"
 
     return scripts_info
 
@@ -164,8 +190,8 @@ def check(mode, model, version, out, script, v):
                 success = False
         # Check if files exist
         files_checked = exist_files(
-            config_test.get("actual", {}).get("check_files", []),
-            f"{user_info['test_dir']}/comp/{model}/{model}-{version}",
+            config_test.get("actual", {}).get("files", []),
+            f"{user_info['test_dir']}/{mode}/{model}/{model}-{version}",
         )
         success = success and files_checked
     # Compare scripts with previous, if existing
@@ -185,6 +211,8 @@ def exist_files(files, path):
 def run_test(scripts_info, actually_run):
     # Loop through tests
     for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
         for script, v in scripts.items():
             if actually_compile:
                 check = ""

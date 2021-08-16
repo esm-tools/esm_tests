@@ -1,0 +1,7 @@
+comp:
+        actual:
+                files:
+                    - "bin/fesom.x"
+                    - "bin/echam6"
+        check:
+                comp: all
