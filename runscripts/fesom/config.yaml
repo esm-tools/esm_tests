@@ -1,6 +1,12 @@
 comp:
         actual:
-                check_files:
+                files:
                     - "bin/fesom.x"
         check:
                 comp: all
+run:
+        actual:
+                files: []
+        check:
+                files: []
+                compare: []

@@ -4,4 +4,17 @@ comp:
                     - "bin/fesom.x"
                     - "bin/echam6"
         check:
-                comp: all
+                compare:
+                    - "comp*echam*.sh"
+                    - "comp*fesom*.sh"
+run:
+        actual:
+                files:
+                    - "restart/echam/restart*.nc"
+                    - "restart/fesom/fesom.*.oce.nc*"
+                    - "restart/fesom/fesom.*.ice.nc*"
+                    - "outdata/echam/*"
+                    - "outdata/fesom/*"
+        check:
+                compare:
+                   - ""

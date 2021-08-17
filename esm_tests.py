@@ -6,10 +6,10 @@ import math
 import yaml
 import re
 import shutil
+import time
 
 from loguru import logger
 
-import esm_parser
 from esm_runscripts import color_diff
 
 
@@ -122,7 +122,7 @@ def comp_test(scripts_info, actually_compile):
             os.chdir(general_model_dir)
 
             if os.path.isdir(model_dir):
-                v["state"] = "Directory already exists"
+                v["state"] = {"comp": "Directory already exists"}
                 logger.info(f"\t\tDirectory already exists, skipping")
                 out = ""
             else:
@@ -180,30 +180,35 @@ def comp_test(scripts_info, actually_compile):
             success = check("comp", model, version, out, script, v)
             if success:
                 logger.info("\t\tSuccess!")
-                v["state"] = "success"
+                v["state"] = {"comp": "success"}
 
     return scripts_info
 
 
 def check(mode, model, version, out, script, v):
     success = True
+    mode_name = {"comp": "compilation", "run": "submission"}
     # Load config
     with open(f"{os.path.dirname(v['path'])}/config.yaml", "r") as c:
         config_test = yaml.load(c, Loader=yaml.FullLoader)
+    if mode not in config_test:
+        logger.error(f"Missing '{mode}' section in '{os.path.dirname(v['path'])}/config.yaml'!")
     config_test = config_test[mode]
     # Check for files that should exist
     if mode == "comp":
         actually_do = actually_compile
     elif mode == "run":
         actually_do = actually_run
-    if actually_do:
+    if actually_do or mode=="run":
         # Check for errors in the output
         errors = config_test.get("actual", {}).get("errors", [])
         if mode == "comp":
             errors.append("errors occurred!")
+        if mode == "run":
+            errors.append("Traceback (most recent call last):")
         for error in errors:
             if error in out:
-                logger.error("\t\tError during compilation!")
+                logger.error(f"\t\tError during {mode_name[mode]}!")
                 success = False
         # Check if files exist
         files_checked = exist_files(
@@ -227,6 +232,7 @@ def exist_files(files, path):
 
 def run_test(scripts_info, actually_run):
     c = 0
+    submitted = []
     # Loop through tests
     for model, scripts in scripts_info.items():
         if model == "general":
@@ -236,31 +242,92 @@ def run_test(scripts_info, actually_run):
             progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
             runscript_path = v["path"]
-            test_name = os.path.basename(runscript_path.replace(".yaml", ""))
-            run_command = f"esm_master comp-{model}-{version} --no-motd"
             general_run_dir = f"{user_info['test_dir']}/run/{model}/"
-            run_dir = f"{user_info['test_dir']}/run/{model}/{test_name}"
+            run_dir = f"{general_run_dir}/{script}"
             model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
-            logger.info(f"\tSUBMITTING ({progress}%) {model}/{test_name}:")
+            logger.info(f"\tSUBMITTING ({progress}%) {model}/{script}:")
             if not os.path.isdir(general_run_dir):
                 os.makedirs(general_run_dir)
-            os.chdir(os.path.dirname(runscript_path))
-            print(os.getcwd())
 
-            if actually_run:
-                check = ""
+            # Check if the simulation exists
+            if os.path.isdir(run_dir):
+                v["state"] = {"run": "Directory already exists"}
+                logger.info(f"\t\tDirectory already exists, skipping")
+                out = ""
+                if actually_run:
+                    submitted.append((model, script))
             else:
-                check = "-c"
-            # Export test variables
-            env_vars = [
-                f"ACCOUNT=\'{user_info['account']}\'",
-                f"ESM_TESTING_DIR='{general_run_dir}'",
-                f"MODEL_DIR='{model_dir}'",
-            ]
-            # TODO: check if directory exists!!!!!
-            run_command = f"esm_runscripts {v['path']} -e {script} --open-run {check}"
-            out = sh(run_command, env_vars)
-            print(out)
+                os.chdir(os.path.dirname(runscript_path))
+
+                if actually_run:
+                    check_flag = ""
+                else:
+                    check_flag = "-c"
+                # Export test variables
+                env_vars = [
+                    f"ACCOUNT=\'{user_info['account']}\'",
+                    f"ESM_TESTING_DIR='{general_run_dir}'",
+                    f"MODEL_DIR='{model_dir}'",
+                ]
+                run_command = f"esm_runscripts {v['path']} -e {script} --open-run {check_flag}"
+                out = sh(run_command, env_vars)
+
+                # Write output file
+                with open(f"{run_dir}/run.out", "w") as o:
+                    o.write(out)
+
+                # Check submission
+                success = check("run", model, version, out, script, v)
+
+                if actually_run:
+                    submitted.append((model, script))
+
+    # Check if simulations are finished
+    total_sub = len(submitted)
+    subc = 1
+    if total_sub>0:
+        logger.info("\nWaiting for submitted runs to finish... You can choose to cancel the script now and come back to it at a later state with the same command you submitted it, but remember to remove the '-d' so that nothing is deleted and this script can be resumed from where it was.")
+    infoc = 10
+    while submitted:
+        cc = 0
+        finished_runs = []
+        for model, script in submitted:
+            progress = round(subc / total_sub * 100, 1)
+            exp_dir_scripts = f"{user_info['test_dir']}/run/{model}/{script}/scripts/"
+            for f in os.listdir(exp_dir_scripts):
+                if "monitoring_file" in f and ".out" in f:
+                    with open(f"{exp_dir_scripts}/{f}") as m:
+                        monitoring_out = m.read()
+                        if "Reached the end of the simulation, quitting" in monitoring_out:
+                            logger.info(f"\tRUN FINISHED ({progress}%) {model}/{script}")
+                            logger.info(f"\t\tSuccess!")
+                            finished_runs.append(cc)
+                            subc += 1
+                            # add state
+                        elif "ERROR:" in monitoring_out:
+                            logger.info(f"\tRUN FINISHED ({progress}%) {model}/{script}")
+                            logger.error(f"\t\tSimulation crashed!")
+                            finished_runs.append(cc)
+                            subc += 1
+                            # add state
+            # append to finished runs
+            cc += 1
+        for indx in finished_runs[::-1]:
+            del submitted[indx]
+
+        if infoc==10:
+            infoc=0
+            runs = ""
+            for model, script in submitted:
+                runs += f"\t- {model}/{script}\n"
+            logger.info(f"\nWaiting for the following runs to finish:\n{runs}")
+        else:
+            infoc += 1
+        time.sleep(30)
+
+    #TODO: remove run_ directories
+
+    return scripts_info
 
 
 # Parsing
@@ -276,10 +343,13 @@ parser.add_argument(
     "-c", "--comp", default=False, help="Perform compilation", action="store_true"
 )
 parser.add_argument(
-    "-r", "--run", default=False, help="Run the scripts", action="store_true"
+    "-r", "--run", default=False, help="Compile and run the scripts", action="store_true"
 )
 parser.add_argument(
     "-d", "--delete", default=False, help="Delete previous tests", action="store_true"
+)
+parser.add_argument(
+    "-k", "--keep", default=False, help="Keep run_, outdata and restart folders for runs", action="store_true"
 )
 
 
@@ -287,7 +357,10 @@ args = vars(parser.parse_args())
 ignore_user_info = args["no_user"]
 actually_compile = args["comp"]
 actually_run = args["run"]
+if actually_run:
+    actually_compile = True
 delete_tests = args["delete"]
+keep_run_folders = args["keep"]
 
 # Bold strings
 bs = "\033[1m"
@@ -310,7 +383,7 @@ logger.debug(f"User info: {user_info}")
 logger.debug(f"Actually compile: {actually_compile}")
 logger.debug(f"Actually run: {actually_run}")
 
-# Delete previous tests
+# Delete previous tests TODO: do this only for the scripts that are gonna be run
 if delete_tests:
     logger.debug("Deleting previous tests")
     if os.path.isdir(f"{user_info['test_dir']}/comp/"):
@@ -333,5 +406,9 @@ comp_test(scripts_info, actually_compile)
 # Run
 run_test(scripts_info, actually_run)
 
+#TODO: run comparisons if they exist and print a file
 
+#TODO: final output display
+
+#TODO: Do you want to save your compared files?
 yprint(scripts_info)
