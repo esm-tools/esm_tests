@@ -131,6 +131,8 @@ def comp_test(scripts_info, actually_compile):
                     get_command = f"esm_master get-{model}-{version} --no-motd"
                     logger.info("\t\tDownloading")
                     out = sh(get_command)
+                    if "Traceback (most recent call last):" in out:
+                        logger.error(f"\t\t\tProblem downloading!\n\n{out}")
                 # For no compilation trick esm_master into thinking that the source code has been downloaded
                 else:
                     # Evaluate and create folders to trick esm_master
@@ -208,7 +210,7 @@ def check(mode, model, version, out, script, v):
             errors.append("Traceback (most recent call last):")
         for error in errors:
             if error in out:
-                logger.error(f"\t\tError during {mode_name[mode]}!")
+                logger.error(f"\t\tError during {mode_name[mode]}!\n\n{out}")
                 success = False
         # Check if files exist
         files_checked = exist_files(
