@@ -130,3 +130,4 @@ dmypy.json
 
 # Config file
 user_config.yaml
+test_config.yaml

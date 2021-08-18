@@ -56,16 +56,29 @@ def yprint(pdict):
 def get_scripts():
     scripts_info = {}
     ns = 0
+    # Load test info
+    test_config = f"{script_dir}/test_config.yaml"
+    if os.path.isfile(test_config):
+        with open(test_config, "r") as t:
+            test_info = yaml.load(t, Loader=yaml.FullLoader)
+    else:
+        test_info = {}
+    if len(test_info)>0:
+        test_all = False
+    else:
+        test_all = True
     for model in os.listdir(runscripts_dir):
-        scripts_info[model] = {}
-        for script in os.listdir(f"{runscripts_dir}/{model}"):
-            if script != "config.yaml" and ".swp" not in script:
-                scripts_info[model][script.replace(".yaml", "")] = {}
-                scripts_info[model][script.replace(".yaml", "")][
-                    "path"
-                ] = f"{runscripts_dir}/{model}/{script}"
-                scripts_info[model][script.replace(".yaml", "")]["state"] = {}
-                ns += 1
+        if test_all or test_info.get(model, False):
+            scripts_info[model] = {}
+            for script in os.listdir(f"{runscripts_dir}/{model}"):
+                if test_all or isinstance(test_info.get(model), str) or script in test_info.get(model, []):
+                    if script != "config.yaml" and ".swp" not in script:
+                        scripts_info[model][script.replace(".yaml", "")] = {}
+                        scripts_info[model][script.replace(".yaml", "")][
+                            "path"
+                        ] = f"{runscripts_dir}/{model}/{script}"
+                        scripts_info[model][script.replace(".yaml", "")]["state"] = {}
+                        ns += 1
     scripts_info["general"] = {"num_scripts": ns}
     return scripts_info
 
