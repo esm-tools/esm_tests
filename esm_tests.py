@@ -366,6 +366,7 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = True
+                            success = check("run", model, version, "", script, v)
                         elif "ERROR:" in monitoring_out:
                             logger.info(
                                 f"\tRUN FINISHED ({progress}%) {model}/{script}"
@@ -374,7 +375,7 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = False
-            success = check("run", model, version, "", script, v)
+                            success = check("run", model, version, "", script, v)
             if not keep_run_folders:
                 folders_to_remove = ["run_", "restart", "outdata", "input", "forcing", "unknown"]
                 logger.debug(f"\t\tDeleting {folders_to_remove}")
