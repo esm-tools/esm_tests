@@ -336,7 +336,8 @@ def run_test(scripts_info, actually_run):
         for model, script in submitted:
             v = scripts_info[model][script]
             progress = round(subc / total_sub * 100, 1)
-            exp_dir_scripts = f"{user_info['test_dir']}/run/{model}/{script}/scripts/"
+            exp_dir = f"{user_info['test_dir']}/run/{model}/{script}/"
+            exp_dir_scripts = f"{exp_dir}/scripts/"
             for f in os.listdir(exp_dir_scripts):
                 if "monitoring_file" in f and ".out" in f:
                     with open(f"{exp_dir_scripts}/{f}") as m:
@@ -361,7 +362,14 @@ def run_test(scripts_info, actually_run):
                             subc += 1
                             v["state"]["run_finished"] = False
             success = check("run", model, version, "", script, v)
-            # TODO: remove run_ directories, restarts, outdata, input
+            if not keep_run_folders:
+                folders_to_remove = ["run_", "restart", "outdata", "input", "forcing", "unknown"]
+                logger.debug(f"\t\tDeleting {folders_to_remove}")
+                for folder in os.listdir(exp_dir):
+                    for fr in folders_to_remove:
+                        if fr in folder:
+                            shutil.rmtree(f"{exp_dir}/{folder}")
+                            continue
             # append to finished runs
             cc += 1
         for indx in finished_runs[::-1]:
@@ -453,7 +461,7 @@ if delete_tests:
 # Gather scripts
 scripts_info = get_scripts()
 
-# Cut down info with user_scripts
+# TODO: Cut down info with user_scripts
 
 # Complete scripts_info
 scripts_info = read_info_from_rs(scripts_info)
