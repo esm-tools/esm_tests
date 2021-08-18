@@ -6,7 +6,12 @@ comp:
                 comp: all
 run:
         actual:
-                files: []
+                errors:
+                    - "MISSING FILES"
+                files:
+                    - "outdata/fesom/*.fesom.*.nc"
+                    - "restart/fesom/fesom.*.oce.nc*"
+                    - "restart/fesom/fesom.*.ice.nc*"
         check:
                 files: []
                 compare: []

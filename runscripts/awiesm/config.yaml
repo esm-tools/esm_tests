@@ -9,12 +9,14 @@ comp:
                     - "comp*fesom*.sh"
 run:
         actual:
+                errors:
+                    - "MISSING FILES"
                 files:
-                    - "restart/echam/restart*.nc"
+                    - "restart/echam/restart*.nc*"
                     - "restart/fesom/fesom.*.oce.nc*"
                     - "restart/fesom/fesom.*.ice.nc*"
                     - "outdata/echam/*"
-                    - "outdata/fesom/*"
+                    - "outdata/fesom/*.fesom.*.nc"
         check:
                 compare:
                    - ""
