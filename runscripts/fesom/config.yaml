@@ -10,8 +10,11 @@ run:
                     - "MISSING FILES"
                 files:
                     - "outdata/fesom/*.fesom.*.nc"
-                    - "restart/fesom/fesom.*.oce.nc*"
-                    - "restart/fesom/fesom.*.ice.nc*"
+                    - "restart/fesom/fesom.*.oce.restart.nc*"
+                    - "restart/fesom/fesom.*.ice.restart.nc*"
         check:
                 files: []
                 compare: []
+computers:
+        - ollie
+        - mistral

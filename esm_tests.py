@@ -12,6 +12,7 @@ import glob
 from loguru import logger
 
 from esm_runscripts import color_diff
+from esm_parser import determine_computer_from_hostname
 
 
 def user_config():
@@ -63,15 +64,33 @@ def get_scripts():
             test_info = yaml.load(t, Loader=yaml.FullLoader)
     else:
         test_info = {}
-    if len(test_info)>0:
+    if len(test_info) > 0:
         test_all = False
     else:
         test_all = True
     for model in os.listdir(runscripts_dir):
         if test_all or test_info.get(model, False):
+            # Check computer
+            model_config = f"{runscripts_dir}/{model}/config.yaml"
+            if not os.path.isfile(model_config):
+                logger.error(f"'{model_config}' not found!")
+            with open(model_config, "r") as c:
+                config_test = yaml.load(c, Loader=yaml.FullLoader)
+            computers = config_test.get("computers", False)
+            this_computer = (
+                determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
+            )
+            if computers:
+                if this_computer not in computers:
+                    continue
+
             scripts_info[model] = {}
             for script in os.listdir(f"{runscripts_dir}/{model}"):
-                if test_all or isinstance(test_info.get(model), str) or script in test_info.get(model, []):
+                if (
+                    test_all
+                    or isinstance(test_info.get(model), str)
+                    or script in test_info.get(model, [])
+                ):
                     if script != "config.yaml" and ".swp" not in script:
                         scripts_info[model][script.replace(".yaml", "")] = {}
                         scripts_info[model][script.replace(".yaml", "")][
@@ -377,7 +396,14 @@ def run_test(scripts_info, actually_run):
                             v["state"]["run_finished"] = False
                             success = check("run", model, version, "", script, v)
             if not keep_run_folders:
-                folders_to_remove = ["run_", "restart", "outdata", "input", "forcing", "unknown"]
+                folders_to_remove = [
+                    "run_",
+                    "restart",
+                    "outdata",
+                    "input",
+                    "forcing",
+                    "unknown",
+                ]
                 logger.debug(f"\t\tDeleting {folders_to_remove}")
                 for folder in os.listdir(exp_dir):
                     for fr in folders_to_remove:
