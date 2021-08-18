@@ -3,10 +3,7 @@ comp:
                 files:
                     - "bin/fesom.x"
                     - "bin/echam6"
-        check:
-                compare:
-                    - "comp*echam*.sh"
-                    - "comp*fesom*.sh"
+        check: {}
 run:
         actual:
                 errors:
@@ -17,8 +14,6 @@ run:
                     - "restart/fesom/fesom.*.ice.restart.nc*"
                     - "outdata/echam/*"
                     - "outdata/fesom/*.fesom.*.nc"
-        check:
-                compare:
-                   - ""
+        check: {}
 computer:
         - mistral

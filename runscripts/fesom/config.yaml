@@ -2,8 +2,7 @@ comp:
         actual:
                 files:
                     - "bin/fesom.x"
-        check:
-                comp: all
+        check: {}
 run:
         actual:
                 errors:
@@ -12,9 +11,7 @@ run:
                     - "outdata/fesom/*.fesom.*.nc"
                     - "restart/fesom/fesom.*.oce.restart.nc*"
                     - "restart/fesom/fesom.*.ice.restart.nc*"
-        check:
-                files: []
-                compare: []
+        check: {}
 computers:
         - ollie
         - mistral

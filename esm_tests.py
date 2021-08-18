@@ -8,6 +8,7 @@ import re
 import shutil
 import time
 import glob
+import difflib
 
 from loguru import logger
 
@@ -148,7 +149,7 @@ def comp_test(scripts_info, actually_compile):
             c += 1
             progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
-            comp_command = f"esm_master comp-{model}-{version} --no-motd"
+            comp_command = f"esm_master comp-{model}-{version} --no-motd -k"
             general_model_dir = f"{user_info['test_dir']}/comp/{model}"
             model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
             logger.info(f"\tCOMPILING ({progress}%) {model}-{version}:")
@@ -207,12 +208,11 @@ def comp_test(scripts_info, actually_compile):
                     o.write(out)
 
                 # Move and cleanup files
-                if not actually_compile:
-                    for f in os.listdir(general_model_dir):
-                        if "comp-" in f:
-                            shutil.move(f"{general_model_dir}/{f}", model_dir)
-                        if f == "dummy_script.sh":
-                            os.remove(f"{general_model_dir}/{f}")
+                for f in os.listdir(general_model_dir):
+                    if "comp-" in f:
+                        shutil.move(f"{general_model_dir}/{f}", model_dir)
+                    if f == "dummy_script.sh":
+                        os.remove(f"{general_model_dir}/{f}")
 
             # Checks
             success = check("comp", model, version, out, script, v)
@@ -239,15 +239,28 @@ def check(mode, model, version, out, script, v):
     config_test = config_test[config_mode]
     # Check for files that should exist
     if mode == "comp":
+        if actually_compile:
+            test_type = "actual"
+        else:
+            test_type = "check"
         actually_do = actually_compile
+        subfolder = f"{model}-{version}"
     elif mode == "run":
+        if actually_run:
+            test_type = "actual"
+        else:
+            test_type = "check"
         actually_do = actually_run
+        subfolder = script
     elif mode == "submission":
         # Do not perform the file checks before the simulation is finished
         actually_do = False
-    # Check for errors during submission
-    if mode == "submission":
-        errors = config_test.get("actual", {}).get("errors", [])
+        subfolder = script
+        if actually_run:
+            test_type = "actual"
+        else:
+            test_type = "check"
+        errors = config_test.get(test_type, {}).get("errors", [])
         errors.append("Traceback (most recent call last):")
         for error in errors:
             if error in out:
@@ -257,12 +270,9 @@ def check(mode, model, version, out, script, v):
     # Check for missing files and errors during an actual operation (not a check)
     if actually_do:
         # Check for errors in the output
-        errors = config_test.get("actual", {}).get("errors", [])
+        errors = config_test.get(test_type, {}).get("errors", [])
         if mode == "comp":
             errors.append("errors occurred!")
-            subfolder = f"{model}-{version}"
-        if mode == "run":
-            subfolder = script
         for error in errors:
             if error in out:
                 logger.error(f"\t\tError during {mode_name[mode]}!\n\n{out}")
@@ -271,14 +281,71 @@ def check(mode, model, version, out, script, v):
             v["state"][mode] = success
         # Check if files exist
         files_checked = exist_files(
-            config_test.get("actual", {}).get("files", []),
+            config_test.get(test_type, {}).get("files", []),
             f"{user_info['test_dir']}/{mode}/{model}/{subfolder}",
         )
         v["state"][f"{mode}_files"] = files_checked
         success = success and files_checked
+
     # Compare scripts with previous, if existing
+    this_compare_files = compare_files[config_mode]
+    this_compare_files.extend(config_test.get(test_type, {}).get("compare", []))
+    this_test_dir = f"{config_mode}/{model}/{subfolder}/"
+    for cfile in this_compare_files:
+        subpaths = []
+        if cfile=="comp-":
+            for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+                if cfile in f:
+                    subpaths.append(f"{this_test_dir}/{f}")
+            if len(subpaths)==0:
+                logger.error("\t\tNo 'comp-*.sh' file found!")
+        elif cfile==".sad":
+            pass
+        elif cfile=="finished_config":
+            pass
+        elif cfile=="namelists":
+            pass
+        else:
+            subpaths = [f"{this_test_dir}/{cfile}"]
+        for sp in subpaths:
+            if not os.path.isfile(f"{user_info['test_dir']}/{sp}"):
+                logger.error(f"\t\t'{sp}' file is missing!")
+                identical = False
+            else:
+                # Check if it exist in last_tested
+                if os.path.isfile(f"{last_tested_dir}/{sp}"):
+                    identical, differences = print_diff(f"{last_tested_dir}/{sp}", f"{user_info['test_dir']}/{sp}", sp)
+                    success += identical
+                    if not identical:
+                        v["differences"] = v.get("differences", {})
+                        v["differences"][config_mode] = v["differences"].get(config_mode, {})
+                        v["differences"][config_mode][sp] = differences
+                else:
+                    logger.warning(f"\t\t'{sp}' file not yet in 'last_tested'")
 
     return success
+
+
+def print_diff(sscript, tscript, name):
+    script_s = open(sscript).readlines()
+    script_t = open(tscript).readlines()
+
+    diffobj = difflib.SequenceMatcher(a=script_s, b=script_t)
+    differences = ""
+    if diffobj.ratio() == 1:
+        logger.info(f"\t\t{name} files are identical")
+        identical = True
+    else:
+        # Find differences
+        pdifferences = ""
+        for line in color_diff(difflib.unified_diff(script_s, script_t)):
+            differences += line
+            pdifferences += f"\t\t{line}"
+
+        logger.info(f"\n\tDifferences in {name}:\n{pdifferences}\n")
+        identical = False
+
+    return identical, differences
 
 
 def exist_files(files, path):
@@ -476,6 +543,7 @@ be = "\033[0m"
 script_dir = os.path.dirname(os.path.realpath(__file__))
 runscripts_dir = f"{script_dir}/runscripts/"
 current_dir = os.getcwd()
+last_tested_dir = f"{current_dir}/last_tested/"
 
 # Predefined for later
 user_scripts = dict(comp={}, run={})
@@ -485,6 +553,12 @@ if not ignore_user_info:
     user_info = user_config()
 else:
     user_info = None
+
+# Define default files for comparisson
+compare_files = {
+    "comp": ["comp-"],
+    "run": [".sad", "finished_config", "namelists"]
+}
 
 logger.debug(f"User info: {user_info}")
 logger.debug(f"Actually compile: {actually_compile}")
