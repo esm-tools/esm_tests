@@ -10,10 +10,12 @@ import time
 import glob
 import difflib
 import copy
+import regex as re
 
 from loguru import logger
 
 from esm_runscripts import color_diff
+from esm_parser import yaml_file_to_dict
 from esm_parser import determine_computer_from_hostname
 
 
@@ -213,14 +215,14 @@ def comp_test(scripts_info, actually_compile):
                         os.remove(f"{general_model_dir}/{f}")
 
             # Checks
-            success = check("comp", model, version, out, script, v)
+            success = check("comp", model, version, out, script, v, ignore)
             if success:
                 logger.info("\t\tSuccess!")
 
     return scripts_info
 
 
-def check(mode, model, version, out, script, v):
+def check(mode, model, version, out, script, v, ignore):
     success = True
     mode_name = {"comp": "compilation", "submission": "submission", "run": "runtime"}
     # Load config
@@ -290,16 +292,17 @@ def check(mode, model, version, out, script, v):
     this_compare_files.extend(config_test.get(test_type, {}).get("compare", []))
     this_test_dir = f"{config_mode}/{model}/{subfolder}/"
     for cfile in this_compare_files:
-        subpaths = get_rel_paths_compare_files(cfile, this_test_dir)
-        for sp in subpaths:
+        ignore_lines = ignore.get(cfile, [])
+        subpaths_source, subpaths_target = get_rel_paths_compare_files(cfile, this_test_dir)
+        for sp, sp_t in zip(subpaths_source, subpaths_target):
             if not os.path.isfile(f"{user_info['test_dir']}/{sp}"):
                 logger.error(f"\t\t'{sp}' file is missing!")
                 identical = False
             else:
                 # Check if it exist in last_tested
-                if os.path.isfile(f"{last_tested_dir}/{this_computer}/{sp}"):
+                if os.path.isfile(f"{last_tested_dir}/{this_computer}/{sp_t}"):
                     identical, differences = print_diff(
-                        f"{last_tested_dir}/{this_computer}/{sp}", f"{user_info['test_dir']}/{sp}", sp
+                        f"{last_tested_dir}/{this_computer}/{sp_t}", f"{user_info['test_dir']}/{sp}", sp, ignore_lines
                     )
                     success += identical
                     if not identical:
@@ -309,7 +312,7 @@ def check(mode, model, version, out, script, v):
                         )
                         v["differences"][config_mode][sp] = differences
                 else:
-                    logger.warning(f"\t\t'{sp}' file not yet in 'last_tested'")
+                    logger.warning(f"\t\t'{sp_t}' file not yet in 'last_tested'")
 
     return success
 
@@ -322,26 +325,98 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
                 subpaths.append(f"{this_test_dir}/{f}")
         if len(subpaths) == 0:
             logger.error("\t\tNo 'comp-*.sh' file found!")
-    elif cfile == ".sad":
-        pass
-    elif cfile == "finished_config":
-        pass
+    elif cfile in [".sad", "finished_config"]:
+        files_to_folders = {".sad": "scripts", "finished_config": "config"}
+        ctype = files_to_folders[cfile]
+        for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+            # Take the first run directory
+            if "run_" in f:
+                cf_path = f"{this_test_dir}/{f}/{ctype}/"
+                cfiles = glob.glob(f"{user_info['test_dir']}/{cf_path}/*{cfile}*")
+                # If not found, try in the general directory
+                if len(cfiles)==0:
+                    cf_path = f"{this_test_dir}/{ctype}/"
+                    cfiles = glob.glob(f"{user_info['test_dir']}/{cf_path}/*{cfile}*")
+                # Make sure we always take the first run
+                cfiles.sort()
+                num = 0
+                if os.path.islink(f"{user_info['test_dir']}/{cf_path}/{cfiles[num].split('/')[-1]}"):
+                    num = 1
+                subpaths.append(f"{cf_path}/{cfiles[num].split('/')[-1]}")
+                break
     elif cfile == "namelists":
-        pass
+        # Get path of the finished_config
+        s_config_yaml, _ = get_rel_paths_compare_files("finished_config", this_test_dir)
+        namelists = extract_namelists(f"{user_info['test_dir']}/{s_config_yaml[0]}")
+        for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+            # Take the first run directory
+            if "run_" in f:
+                cf_path = f"{this_test_dir}/{f}/work/"
+                for n in namelists:
+                    if not os.path.isfile(f"{user_info['test_dir']}/{cf_path}/{n}"):
+                        logger.debug(f"'{cf_path}/{n}' does not exist!")
+                    subpaths.append(f"{cf_path}/{n}")
+                break
     else:
         subpaths = [f"{this_test_dir}/{cfile}"]
 
-    return subpaths
+    # Remove run directory from the targets
+    subpaths_source = subpaths
+    subpaths_target = []
+    datestamp_format = re.compile(r'_[\d]{8}-[\d]{8}$')
+    for sp in subpaths:
+        sp_t = ""
+        pieces = sp.split("/")
+        for p in pieces:
+            if "run_" not in p:
+                sp_t += f"/{p}"
+        # Remove the datestamp
+        if datestamp_format.match(sp_t):
+            sp_t.replace(datestamp_format.findall(sp_t)[0], "")
+        subpaths_target.append(sp_t)
+
+    return subpaths_source, subpaths_target
 
 
-def print_diff(sscript, tscript, name):
+def extract_namelists(s_config_yaml):
+    # Read config file
+    config = yaml_file_to_dict(s_config_yaml)
+
+    namelists = []
+    for component in config.keys():
+        namelists.extend(config[component].get("namelists", []))
+
+    return namelists
+
+
+def print_diff(sscript, tscript, name, ignore_lines):
     script_s = open(sscript).readlines()
     script_t = open(tscript).readlines()
+
+    # Check for ignored lines
+    new_script_s = []
+    for line in script_s:
+        ignore_this = False
+        for iline in ignore_lines:
+            if iline in line:
+                ignore_this = True
+        if not ignore_this:
+            new_script_s.append(line)
+    script_s = new_script_s
+    new_script_t = []
+    for line in script_t:
+        ignore_this = False
+        for iline in ignore_lines:
+            if iline in line:
+                ignore_this = True
+        if not ignore_this:
+            new_script_t.append(line)
+    script_t = new_script_t
 
     diffobj = difflib.SequenceMatcher(a=script_s, b=script_t)
     differences = ""
     if diffobj.ratio() == 1:
-        logger.info(f"\t\t{name} files are identical")
+        logger.info(f"\t\t'{name}' files are identical")
         identical = True
     else:
         # Find differences
@@ -424,7 +499,7 @@ def run_test(scripts_info, actually_run):
                     submitted.append((model, script))
 
             # Check submission
-            success = check("submission", model, version, out, script, v)
+            success = check("submission", model, version, out, script, v, ignore)
 
     # Check if simulations are finished
     total_sub = len(submitted)
@@ -460,7 +535,7 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = True
-                            success = check("run", model, version, "", script, v)
+                            success = check("run", model, version, "", script, v, ignore)
                         elif "ERROR:" in monitoring_out:
                             logger.info(
                                 f"\tRUN FINISHED ({progress}%) {model}/{script}"
@@ -469,7 +544,7 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = False
-                            success = check("run", model, version, "", script, v)
+                            success = check("run", model, version, "", script, v, ignore)
             if not keep_run_folders:
                 folders_to_remove = [
                     "run_",
@@ -569,32 +644,24 @@ def save_files(scripts_info, user_choice):
         # Loop through scripts
         for script, v in scripts.items():
             version = v["version"]
-            runscript_path = v["path"]
-            general_run_dir = f"{user_info['test_dir']}/run/{model}/"
-            run_dir = f"{general_run_dir}/{script}"
-            model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
             # Loop through comp and run
             for mode in ["comp", "run"]:
                 if mode=="comp":
                     this_compare_files = compare_files_comp
                     subfolder = f"{model}-{version}"
-                    # Prepare directories
-                    if not os.path.isdir(f"{last_tested_dir}/{this_computer}/comp/{model}/{subfolder}"):
-                        os.makedirs(f"{last_tested_dir}/{this_computer}/comp/{model}/{subfolder}")
                 elif mode=="run":
                     this_compare_files = compare_files_run
                     subfolder = f"{script}"
-                    # Prepare directories
-                    if not os.path.isdir(f"{last_tested_dir}/{this_computer}/run/{model}/{subfolder}"):
-                        os.makedirs(f"{last_tested_dir}/{this_computer}/run/{model}/{subfolder}")
                 this_test_dir = f"{mode}/{model}/{subfolder}/"
                 # Loop through comparefiles
                 for cfile in this_compare_files:
-                    subpaths = get_rel_paths_compare_files(cfile, this_test_dir)
-                    for sp in subpaths:
-                        if os.path.isfile(f"{last_tested_dir}/{sp}"):
-                            logger.debug(f"\t'{sp}' file in '{last_tested_dir}' will be overwritten")
-                        shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp}")
+                    subpaths_source, subpaths_target = get_rel_paths_compare_files(cfile, this_test_dir)
+                    for sp, sp_t in zip(subpaths_source, subpaths_target):
+                        if os.path.isfile(f"{last_tested_dir}/{sp_t}"):
+                            logger.debug(f"\t'{sp_t}' file in '{last_tested_dir}' will be overwritten")
+                        if not os.path.isdir(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}")):
+                            os.makedirs(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}"))
+                        shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp_t}")
 
 
 # Parsing
@@ -662,6 +729,10 @@ if not ignore_user_info:
     user_info = user_config()
 else:
     user_info = None
+
+# Define lines to be ignored during comparison
+with open(f"{script_dir}/ignore_compare.yaml", "r") as i:
+    ignore = yaml.load(i, Loader=yaml.FullLoader)
 
 # Define default files for comparisson
 compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}

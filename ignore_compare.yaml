@@ -1,0 +1,4 @@
+.sad:
+    - "echo $(date +%c) : compute"
+finished_config:
+    - "jobid: "
