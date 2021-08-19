@@ -16,7 +16,7 @@ module load automake/1.14.1
 module unload gcc
 module load gcc/4.8.2
 
-asdexport LC_ALL=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 export FC=mpiifort
 export F77=mpiifort
 export MPIFC=mpiifort

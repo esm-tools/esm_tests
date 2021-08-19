@@ -9,6 +9,7 @@ import shutil
 import time
 import glob
 import difflib
+import copy
 
 from loguru import logger
 
@@ -78,9 +79,6 @@ def get_scripts():
             with open(model_config, "r") as c:
                 config_test = yaml.load(c, Loader=yaml.FullLoader)
             computers = config_test.get("computers", False)
-            this_computer = (
-                determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
-            )
             if computers:
                 if this_computer not in computers:
                     continue
@@ -288,34 +286,20 @@ def check(mode, model, version, out, script, v):
         success = success and files_checked
 
     # Compare scripts with previous, if existing
-    this_compare_files = compare_files[config_mode]
+    this_compare_files = copy.deepcopy(compare_files[config_mode])
     this_compare_files.extend(config_test.get(test_type, {}).get("compare", []))
     this_test_dir = f"{config_mode}/{model}/{subfolder}/"
     for cfile in this_compare_files:
-        subpaths = []
-        if cfile == "comp-":
-            for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
-                if cfile in f:
-                    subpaths.append(f"{this_test_dir}/{f}")
-            if len(subpaths) == 0:
-                logger.error("\t\tNo 'comp-*.sh' file found!")
-        elif cfile == ".sad":
-            pass
-        elif cfile == "finished_config":
-            pass
-        elif cfile == "namelists":
-            pass
-        else:
-            subpaths = [f"{this_test_dir}/{cfile}"]
+        subpaths = get_rel_paths_compare_files(cfile, this_test_dir)
         for sp in subpaths:
             if not os.path.isfile(f"{user_info['test_dir']}/{sp}"):
                 logger.error(f"\t\t'{sp}' file is missing!")
                 identical = False
             else:
                 # Check if it exist in last_tested
-                if os.path.isfile(f"{last_tested_dir}/{sp}"):
+                if os.path.isfile(f"{last_tested_dir}/{this_computer}/{sp}"):
                     identical, differences = print_diff(
-                        f"{last_tested_dir}/{sp}", f"{user_info['test_dir']}/{sp}", sp
+                        f"{last_tested_dir}/{this_computer}/{sp}", f"{user_info['test_dir']}/{sp}", sp
                     )
                     success += identical
                     if not identical:
@@ -328,6 +312,26 @@ def check(mode, model, version, out, script, v):
                     logger.warning(f"\t\t'{sp}' file not yet in 'last_tested'")
 
     return success
+
+
+def get_rel_paths_compare_files(cfile, this_test_dir):
+    subpaths = []
+    if cfile == "comp-":
+        for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+            if cfile in f:
+                subpaths.append(f"{this_test_dir}/{f}")
+        if len(subpaths) == 0:
+            logger.error("\t\tNo 'comp-*.sh' file found!")
+    elif cfile == ".sad":
+        pass
+    elif cfile == "finished_config":
+        pass
+    elif cfile == "namelists":
+        pass
+    else:
+        subpaths = [f"{this_test_dir}/{cfile}"]
+
+    return subpaths
 
 
 def print_diff(sscript, tscript, name):
@@ -520,6 +524,79 @@ def del_prev_tests(scripts_info):
                     shutil.rmtree(f"{user_info['test_dir']}/run/{model}")
 
 
+def save_files(scripts_info, user_choice):
+    if not user_choice:
+        not_answered = True
+        while not_answered:
+            # Ask if saving of the compared files is required
+            save = input(
+                f"Would you like to save the files in the '{last_tested_dir}' folder for later "
+                + "comparisson and/or committing to GitHub?[y/n]: "
+            )
+            if save=="y":
+                not_answered = False
+            elif save=="n":
+                logger.info(f"No files will be saved in '{last_tested_dir}'")
+                not_answered = False
+                return
+            else:
+                print(f"'{save}' is not a valid answer!")
+
+    # Select test types
+    if actually_compile:
+        test_type_c = "actual"
+    else:
+        test_type_c = "check"
+    if actually_run:
+        test_type_r = "actual"
+    else:
+        test_type_r = "check"
+
+    logger.info(f"Saving files to '{last_tested_dir}'...")
+    # Loop through models
+    for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
+        model_config = f"{runscripts_dir}/{model}/config.yaml"
+        if not os.path.isfile(model_config):
+            logger.error(f"'{model_config}' not found!")
+        with open(model_config, "r") as c:
+            config_test = yaml.load(c, Loader=yaml.FullLoader)
+        compare_files_comp = copy.deepcopy(compare_files["comp"])
+        compare_files_comp.extend(config_test.get("comp", {}).get(test_type_c, {}).get("compare", []))
+        compare_files_run = copy.deepcopy(compare_files["run"])
+        compare_files_run.extend(config_test.get("run", {}).get(test_type_r, {}).get("compare", []))
+        # Loop through scripts
+        for script, v in scripts.items():
+            version = v["version"]
+            runscript_path = v["path"]
+            general_run_dir = f"{user_info['test_dir']}/run/{model}/"
+            run_dir = f"{general_run_dir}/{script}"
+            model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
+            # Loop through comp and run
+            for mode in ["comp", "run"]:
+                if mode=="comp":
+                    this_compare_files = compare_files_comp
+                    subfolder = f"{model}-{version}"
+                    # Prepare directories
+                    if not os.path.isdir(f"{last_tested_dir}/{this_computer}/comp/{model}/{subfolder}"):
+                        os.makedirs(f"{last_tested_dir}/{this_computer}/comp/{model}/{subfolder}")
+                elif mode=="run":
+                    this_compare_files = compare_files_run
+                    subfolder = f"{script}"
+                    # Prepare directories
+                    if not os.path.isdir(f"{last_tested_dir}/{this_computer}/run/{model}/{subfolder}"):
+                        os.makedirs(f"{last_tested_dir}/{this_computer}/run/{model}/{subfolder}")
+                this_test_dir = f"{mode}/{model}/{subfolder}/"
+                # Loop through comparefiles
+                for cfile in this_compare_files:
+                    subpaths = get_rel_paths_compare_files(cfile, this_test_dir)
+                    for sp in subpaths:
+                        if os.path.isfile(f"{last_tested_dir}/{sp}"):
+                            logger.debug(f"\t'{sp}' file in '{last_tested_dir}' will be overwritten")
+                        shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp}")
+
+
 # Parsing
 parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
 parser.add_argument(
@@ -549,6 +626,12 @@ parser.add_argument(
     help="Keep run_, outdata and restart folders for runs",
     action="store_true",
 )
+parser.add_argument(
+    "-s",
+    "--save",
+    default="Not defined",
+    help="Save files for comparisson in 'last_tested' folder",
+)
 
 
 args = vars(parser.parse_args())
@@ -559,6 +642,7 @@ if actually_run:
     actually_compile = True
 delete_tests = args["delete"]
 keep_run_folders = args["keep"]
+save_flag = args["save"]
 
 # Bold strings
 bs = "\033[1m"
@@ -568,6 +652,7 @@ script_dir = os.path.dirname(os.path.realpath(__file__))
 runscripts_dir = f"{script_dir}/runscripts/"
 current_dir = os.getcwd()
 last_tested_dir = f"{current_dir}/last_tested/"
+this_computer = (determine_computer_from_hostname().split("/")[-1].replace(".yaml", ""))
 
 # Predefined for later
 user_scripts = dict(comp={}, run={})
@@ -604,5 +689,10 @@ run_test(scripts_info, actually_run)
 
 # TODO: final output display
 
-# TODO: Do you want to save your compared files?
+# Save files
+if save_flag=="Not defined":
+    save_files(scripts_info, False)
+elif save_flag=="true" or save_flag=="True":
+    save_files(scripts_info, True)
+
 yprint(scripts_info)
