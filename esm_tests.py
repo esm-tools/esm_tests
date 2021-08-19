@@ -293,17 +293,17 @@ def check(mode, model, version, out, script, v):
     this_test_dir = f"{config_mode}/{model}/{subfolder}/"
     for cfile in this_compare_files:
         subpaths = []
-        if cfile=="comp-":
+        if cfile == "comp-":
             for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
                 if cfile in f:
                     subpaths.append(f"{this_test_dir}/{f}")
-            if len(subpaths)==0:
+            if len(subpaths) == 0:
                 logger.error("\t\tNo 'comp-*.sh' file found!")
-        elif cfile==".sad":
+        elif cfile == ".sad":
             pass
-        elif cfile=="finished_config":
+        elif cfile == "finished_config":
             pass
-        elif cfile=="namelists":
+        elif cfile == "namelists":
             pass
         else:
             subpaths = [f"{this_test_dir}/{cfile}"]
@@ -314,11 +314,15 @@ def check(mode, model, version, out, script, v):
             else:
                 # Check if it exist in last_tested
                 if os.path.isfile(f"{last_tested_dir}/{sp}"):
-                    identical, differences = print_diff(f"{last_tested_dir}/{sp}", f"{user_info['test_dir']}/{sp}", sp)
+                    identical, differences = print_diff(
+                        f"{last_tested_dir}/{sp}", f"{user_info['test_dir']}/{sp}", sp
+                    )
                     success += identical
                     if not identical:
                         v["differences"] = v.get("differences", {})
-                        v["differences"][config_mode] = v["differences"].get(config_mode, {})
+                        v["differences"][config_mode] = v["differences"].get(
+                            config_mode, {}
+                        )
                         v["differences"][config_mode][sp] = differences
                 else:
                     logger.warning(f"\t\t'{sp}' file not yet in 'last_tested'")
@@ -496,6 +500,26 @@ def run_test(scripts_info, actually_run):
     return scripts_info
 
 
+def del_prev_tests(scripts_info):
+    logger.debug("Deleting previous tests")
+    for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
+        for script, v in scripts.items():
+            if os.path.isdir(
+                f"{user_info['test_dir']}/comp/{model}/{model}-{v['version']}"
+            ):
+                shutil.rmtree(
+                    f"{user_info['test_dir']}/comp/{model}/{model}-{v['version']}"
+                )
+                if len(os.listdir(f"{user_info['test_dir']}/comp/{model}")) == 0:
+                    shutil.rmtree(f"{user_info['test_dir']}/comp/{model}")
+            if os.path.isdir(f"{user_info['test_dir']}/run/{model}/{script}"):
+                shutil.rmtree(f"{user_info['test_dir']}/run/{model}/{script}")
+                if len(os.listdir(f"{user_info['test_dir']}/run/{model}")) == 0:
+                    shutil.rmtree(f"{user_info['test_dir']}/run/{model}")
+
+
 # Parsing
 parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
 parser.add_argument(
@@ -555,39 +579,28 @@ else:
     user_info = None
 
 # Define default files for comparisson
-compare_files = {
-    "comp": ["comp-"],
-    "run": [".sad", "finished_config", "namelists"]
-}
+compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}
 
 logger.debug(f"User info: {user_info}")
 logger.debug(f"Actually compile: {actually_compile}")
 logger.debug(f"Actually run: {actually_run}")
 
-# Delete previous tests TODO: do this only for the scripts that are gonna be run
-if delete_tests:
-    logger.debug("Deleting previous tests")
-    if os.path.isdir(f"{user_info['test_dir']}/comp/"):
-        shutil.rmtree(f"{user_info['test_dir']}/comp/")
-    if os.path.isdir(f"{user_info['test_dir']}/run/"):
-        shutil.rmtree(f"{user_info['test_dir']}/run/")
 
 # Gather scripts
 scripts_info = get_scripts()
 
-# TODO: Cut down info with user_scripts
-
 # Complete scripts_info
 scripts_info = read_info_from_rs(scripts_info)
 
+# Delete previous test
+if delete_tests:
+    del_prev_tests(scripts_info)
 
 # Compile
 comp_test(scripts_info, actually_compile)
 
 # Run
 run_test(scripts_info, actually_run)
-
-# TODO: run comparisons if they exist and print a file
 
 # TODO: final output display
 
