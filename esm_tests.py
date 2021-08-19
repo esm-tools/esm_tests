@@ -328,7 +328,9 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
     elif cfile in [".sad", "finished_config"]:
         files_to_folders = {".sad": "scripts", "finished_config": "config"}
         ctype = files_to_folders[cfile]
-        for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+        ldir = os.listdir(f"{user_info['test_dir']}/{this_test_dir}")
+        ldir.sort()
+        for f in ldir:
             # Take the first run directory
             if "run_" in f:
                 cf_path = f"{this_test_dir}/{f}/{ctype}/"
@@ -348,7 +350,9 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
         # Get path of the finished_config
         s_config_yaml, _ = get_rel_paths_compare_files("finished_config", this_test_dir)
         namelists = extract_namelists(f"{user_info['test_dir']}/{s_config_yaml[0]}")
-        for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
+        ldir = os.listdir(f"{user_info['test_dir']}/{this_test_dir}")
+        ldir.sort()
+        for f in ldir:
             # Take the first run directory
             if "run_" in f:
                 cf_path = f"{this_test_dir}/{f}/work/"
