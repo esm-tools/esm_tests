@@ -1,7 +1,7 @@
 comp:
         actual:
                 files:
-                    - "bin/fesom.x"
+                    - "bin/fesom*"
                     - "bin/echam6"
         check: {}
 run:
