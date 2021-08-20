@@ -15,7 +15,6 @@ import regex as re
 from loguru import logger
 
 from esm_runscripts import color_diff
-from esm_parser import yaml_file_to_dict
 from esm_parser import determine_computer_from_hostname
 
 
@@ -109,7 +108,6 @@ def read_info_from_rs(scripts_info):
         if model == "general":
             continue
         for script, v in scripts.items():
-            # runscript = esm_parser.yaml_file_to_dict(v["path"])
             with open(v["path"], "r") as rs:
                 runscript = yaml.load(rs, Loader=yaml.SafeLoader)
             v["version"] = runscript[model]["version"]
@@ -386,7 +384,8 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
 
 def extract_namelists(s_config_yaml):
     # Read config file
-    config = yaml_file_to_dict(s_config_yaml)
+    with open(s_config_yaml, "r") as c:
+        config = yaml.load(c, Loader=yaml.FullLoader)
 
     namelists = []
     for component in config.keys():
