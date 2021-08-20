@@ -377,8 +377,8 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
             if "run_" not in p:
                 sp_t += f"/{p}"
         # Remove the datestamp
-        if datestamp_format.match(sp_t):
-            sp_t.replace(datestamp_format.findall(sp_t)[0], "")
+        if datestamp_format.findall(sp_t):
+            sp_t = sp_t.replace(datestamp_format.findall(sp_t)[0], "")
         subpaths_target.append(sp_t)
 
     return subpaths_source, subpaths_target
