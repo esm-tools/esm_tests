@@ -10,6 +10,7 @@ import time
 import glob
 import difflib
 import copy
+import colorama
 import regex as re
 
 from loguru import logger
@@ -669,6 +670,55 @@ def save_files(scripts_info, user_choice):
                         shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp_t}")
 
 
+def print_results(scripts_info):
+    colorama.init(autoreset = True)
+    results = format_results(scripts_info, this_computer)
+
+    print()
+    print()
+    print(f"{bs}RESULTS{be}")
+    print()
+    for model, versions in results.items():
+        print(f"{colorama.Fore.CYAN}{model}:")
+        for version, scripts in versions.items():
+            print(f"    {colorama.Fore.MAGENTA}{version}:")
+            for script, computers in scripts.items():
+                print(f"        {colorama.Fore.WHITE}{script}:")
+                for computer, data in computers.items():
+                    if data["compilation"]:
+                        compilation = f"{colorama.Fore.GREEN}compiles"
+                    else:
+                        compilation = f"{colorama.Fore.RED}compilation failed"
+                    if data["run"]:
+                        run = f"{colorama.Fore.GREEN}runs"
+                    else:
+                        run = f"{colorama.Fore.RED}run failed"
+                    print(f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}")
+    print()
+    print()
+
+
+def format_results(scripts_info, this_computer):
+    results = {}
+    for model, scripts in scripts_info.items():
+        if model == "general":
+            continue
+        results[model] = {}
+        for script, v in scripts.items():
+            version = v["version"]
+            results[model][version] = results[model].get(version, {})
+            results[model][version][script] = results[model][version].get(script, {})
+            state = v["state"]
+            compilation = state["comp"] and state["comp_files"]
+            run = state["run_finished"] and state["run_files"] and state["submission"]
+            results[model][version][script][this_computer] = {
+                "compilation": compilation,
+                "run": run
+            }
+
+    return results
+
+
 # Parsing
 parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
 parser.add_argument(
@@ -763,7 +813,8 @@ comp_test(scripts_info, actually_compile)
 # Run
 run_test(scripts_info, actually_run)
 
-# TODO: final output display
+# Print results
+print_results(scripts_info)
 
 # Save files
 if save_flag=="Not defined":
@@ -771,4 +822,4 @@ if save_flag=="Not defined":
 elif save_flag=="true" or save_flag=="True":
     save_files(scripts_info, True)
 
-yprint(scripts_info)
+#yprint(scripts_info)
