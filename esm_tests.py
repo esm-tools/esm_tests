@@ -209,8 +209,10 @@ def comp_test(scripts_info, actually_compile):
 
                 # Move and cleanup files
                 for f in os.listdir(general_model_dir):
-                    if "comp-" in f:
+                    if "comp-" in f and not os.path.isfile(f"{model_dir}/{f}"):
                         shutil.move(f"{general_model_dir}/{f}", model_dir)
+                    elif "comp-" in f and os.path.isfile(f"{model_dir}/{f}"):
+                        os.remove(f"{general_model_dir}/{f}")
                     if f == "dummy_script.sh":
                         os.remove(f"{general_model_dir}/{f}")
 

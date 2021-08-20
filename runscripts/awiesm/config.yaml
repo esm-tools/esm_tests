@@ -15,5 +15,5 @@ run:
                     - "outdata/echam/*"
                     - "outdata/fesom/*.fesom.*.nc"
         check: {}
-computer:
+computers:
         - mistral
