@@ -292,6 +292,7 @@ def check(mode, model, version, out, script, v, ignore):
     this_compare_files = copy.deepcopy(compare_files[config_mode])
     this_compare_files.extend(config_test.get(test_type, {}).get("compare", []))
     this_test_dir = f"{config_mode}/{model}/{subfolder}/"
+    v["state"][f"{mode}_files_identical"] = True
     for cfile in this_compare_files:
         ignore_lines = ignore.get(cfile, [])
         subpaths_source, subpaths_target = get_rel_paths_compare_files(cfile, this_test_dir)
@@ -312,6 +313,9 @@ def check(mode, model, version, out, script, v, ignore):
                             config_mode, {}
                         )
                         v["differences"][config_mode][sp] = differences
+                        v["state"][f"{mode}_files_identical"] &= False
+                    else:
+                        v["state"][f"{mode}_files_identical"] &= True
                 else:
                     logger.warning(f"\t\t'{sp_t}' file not yet in 'last_tested'")
 
@@ -568,6 +572,7 @@ def run_test(scripts_info, actually_run):
                             continue
             # append to finished runs
             cc += 1
+        finished_runs = list(set(finished_runs))
         for indx in finished_runs[::-1]:
             del submitted[indx]
 
@@ -668,11 +673,19 @@ def save_files(scripts_info, user_choice):
                         if not os.path.isdir(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}")):
                             os.makedirs(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}"))
                         shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp_t}")
-
-
-def print_results(scripts_info):
-    colorama.init(autoreset = True)
+    # Load current state
+    with open(f"{script_dir}/state.yaml", "r") as st:
+        current_state = yaml.load(st, Loader=yaml.FullLoader)
+    # Update with this results
     results = format_results(scripts_info, this_computer)
+    current_state.update(results)
+    with open(f"{script_dir}/state.yaml", "w") as st:
+        state = yaml.dump(current_state)
+        st.write(state)
+
+
+def print_results(results):
+    colorama.init(autoreset = True)
 
     print()
     print()
@@ -709,8 +722,8 @@ def format_results(scripts_info, this_computer):
             results[model][version] = results[model].get(version, {})
             results[model][version][script] = results[model][version].get(script, {})
             state = v["state"]
-            compilation = state["comp"] and state["comp_files"]
-            run = state["run_finished"] and state["run_files"] and state["submission"]
+            compilation = state["comp"] and state["comp_files"] and state.get("comp_files_identical", True)
+            run = state["run_finished"] and state["run_files"] and state["submission"] and state.get("submission_files_identical", True)
             results[model][version][script][this_computer] = {
                 "compilation": compilation,
                 "run": run
@@ -754,6 +767,9 @@ parser.add_argument(
     default="Not defined",
     help="Save files for comparisson in 'last_tested' folder",
 )
+parser.add_argument(
+    "-t", "--state", default=False, help="Print the state stored in state.yaml", action="store_true"
+)
 
 
 args = vars(parser.parse_args())
@@ -765,6 +781,7 @@ if actually_run:
 delete_tests = args["delete"]
 keep_run_folders = args["keep"]
 save_flag = args["save"]
+print_state = args["state"]
 
 # Bold strings
 bs = "\033[1m"
@@ -778,6 +795,13 @@ this_computer = (determine_computer_from_hostname().split("/")[-1].replace(".yam
 
 # Predefined for later
 user_scripts = dict(comp={}, run={})
+
+# Print state if necessary
+if print_state:
+    with open(f"{script_dir}/state.yaml", "r") as st:
+        current_state = yaml.load(st, Loader=yaml.FullLoader)
+    print_results(current_state)
+    sys.exit(1)
 
 # Get user info for testing
 if not ignore_user_info:
@@ -814,7 +838,7 @@ comp_test(scripts_info, actually_compile)
 run_test(scripts_info, actually_run)
 
 # Print results
-print_results(scripts_info)
+print_results(format_results(scripts_info, this_computer))
 
 # Save files
 if save_flag=="Not defined":

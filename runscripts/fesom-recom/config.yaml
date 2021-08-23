@@ -12,7 +12,7 @@ run:
                     - "outdata/fesom/*_fesom_*.nc"
                     - "restart/fesom/fesom.*.oce.nc*"
                     - "restart/fesom/fesom.*.ice.nc*"
-                    - "outdata/recom/aCO2_fesom_19580102.nc"
+                    - "outdata/recom/aCO2_fesom_*.nc"
                     - "restart/recom/fesom.*.bio.nc"
         check: {}
 computers:

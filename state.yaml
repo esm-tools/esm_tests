@@ -1,0 +1,32 @@
+awicm:
+  '2.0':
+    awicm2-initial-monthly:
+      ollie:
+        compilation: true
+        run: true
+  CMIP6:
+    awicm1-initial-monthly:
+      ollie:
+        compilation: true
+        run: false
+fesom:
+  2.0:
+    fesom2.0-initial-monthly:
+      ollie:
+        compilation: true
+        run: true
+  2.1:
+    fesom2.1-initial-monthly:
+      ollie:
+        compilation: true
+        run: true
+fesom-recom:
+  1.4:
+    fesom-recom1.4-initial-daily:
+      ollie:
+        compilation: true
+        run: true
+    fesom-recom1.4-restart-daily:
+      ollie:
+        compilation: true
+        run: true
