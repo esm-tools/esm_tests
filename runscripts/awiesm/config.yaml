@@ -13,7 +13,7 @@ run:
                     - "restart/fesom/fesom.*.oce.restart.nc*"
                     - "restart/fesom/fesom.*.ice.restart.nc*"
                     - "outdata/echam/*"
-                    - "outdata/fesom/*.fesom.*.nc"
+                    # no daily output - "outdata/fesom/*.fesom.*.nc"
         check: {}
 computers:
         - mistral

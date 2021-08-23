@@ -9,14 +9,26 @@ awicm:
       ollie:
         compilation: true
         run: false
+awiesm:
+  2.1-recom:
+    all_awiesm-2.1-recom_mistral:
+      mistral:
+        compilation: true
+        run: true
 fesom:
   2.0:
     fesom2.0-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
   2.1:
     fesom2.1-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true

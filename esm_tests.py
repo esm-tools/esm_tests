@@ -12,6 +12,7 @@ import difflib
 import copy
 import colorama
 import regex as re
+import collections.abc
 
 from loguru import logger
 
@@ -678,7 +679,7 @@ def save_files(scripts_info, user_choice):
         current_state = yaml.load(st, Loader=yaml.FullLoader)
     # Update with this results
     results = format_results(scripts_info, this_computer)
-    current_state.update(results)
+    current_state = deep_update(current_state, results)
     with open(f"{script_dir}/state.yaml", "w") as st:
         state = yaml.dump(current_state)
         st.write(state)
@@ -730,6 +731,15 @@ def format_results(scripts_info, this_computer):
             }
 
     return results
+
+
+def deep_update(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = deep_update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
 
 
 # Parsing
