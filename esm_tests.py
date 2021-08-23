@@ -680,6 +680,7 @@ def save_files(scripts_info, user_choice):
     # Update with this results
     results = format_results(scripts_info, this_computer)
     current_state = deep_update(current_state, results)
+    current_state = sort_dict(current_state)
     with open(f"{script_dir}/state.yaml", "w") as st:
         state = yaml.dump(current_state)
         st.write(state)
@@ -733,12 +734,22 @@ def format_results(scripts_info, this_computer):
     return results
 
 
+def sort_dict(dict_to_sort):
+    if isinstance(dict_to_sort, dict):
+        dict_to_sort = {key:dict_to_sort[key] for key in sorted(dict_to_sort.keys())}
+        for key, value in dict_to_sort.items():
+            dict_to_sort[key] = sort_dict(value)
+
+    return dict_to_sort
+
+
 def deep_update(d, u):
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
             d[k] = deep_update(d.get(k, {}), v)
         else:
             d[k] = v
+
     return d
 
 
