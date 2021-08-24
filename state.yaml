@@ -1,6 +1,9 @@
 awicm:
   '2.0':
     awicm2-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true

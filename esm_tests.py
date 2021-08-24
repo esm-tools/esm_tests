@@ -829,7 +829,12 @@ if __name__ == "__main__":
         action="store_true",
     )
     parser.add_argument(
-        "-c", "--check", default=False, help="Check test", action="store_true"
+        "-c",
+        "--check",
+        default=False,
+        help="Check mode on (does not compile or run, but produces some files that can "
+        + "be compared to previous existing files in 'last_tested' folder)",
+        action="store_true",
     )
     parser.add_argument(
         "-d",
