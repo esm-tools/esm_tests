@@ -353,7 +353,9 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = True
-                            success = check("run", model, version, "", script, v, ignore)
+                            success = check(
+                                "run", model, version, "", script, v, ignore
+                            )
                         elif "ERROR:" in monitoring_out:
                             logger.info(
                                 f"\tRUN FINISHED ({progress}%) {model}/{script}"
@@ -362,7 +364,9 @@ def run_test(scripts_info, actually_run):
                             finished_runs.append(cc)
                             subc += 1
                             v["state"]["run_finished"] = False
-                            success = check("run", model, version, "", script, v, ignore)
+                            success = check(
+                                "run", model, version, "", script, v, ignore
+                            )
             if not keep_run_folders:
                 folders_to_remove = [
                     "run_",
@@ -473,7 +477,9 @@ def check(mode, model, version, out, script, v, ignore):
     v["state"][f"{mode}_files_identical"] = True
     for cfile in this_compare_files:
         ignore_lines = ignore.get(cfile, [])
-        subpaths_source, subpaths_target = get_rel_paths_compare_files(cfile, this_test_dir)
+        subpaths_source, subpaths_target = get_rel_paths_compare_files(
+            cfile, this_test_dir
+        )
         for sp, sp_t in zip(subpaths_source, subpaths_target):
             if not os.path.isfile(f"{user_info['test_dir']}/{sp}"):
                 logger.error(f"\t\t'{sp}' file is missing!")
@@ -482,7 +488,10 @@ def check(mode, model, version, out, script, v, ignore):
                 # Check if it exist in last_tested
                 if os.path.isfile(f"{last_tested_dir}/{this_computer}/{sp_t}"):
                     identical, differences = print_diff(
-                        f"{last_tested_dir}/{this_computer}/{sp_t}", f"{user_info['test_dir']}/{sp}", sp, ignore_lines
+                        f"{last_tested_dir}/{this_computer}/{sp_t}",
+                        f"{user_info['test_dir']}/{sp}",
+                        sp,
+                        ignore_lines,
                     )
                     success += identical
                     if not identical:
@@ -534,13 +543,15 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
                 cf_path = f"{this_test_dir}/{f}/{ctype}/"
                 cfiles = glob.glob(f"{user_info['test_dir']}/{cf_path}/*{cfile}*")
                 # If not found, try in the general directory
-                if len(cfiles)==0:
+                if len(cfiles) == 0:
                     cf_path = f"{this_test_dir}/{ctype}/"
                     cfiles = glob.glob(f"{user_info['test_dir']}/{cf_path}/*{cfile}*")
                 # Make sure we always take the first run
                 cfiles.sort()
                 num = 0
-                if os.path.islink(f"{user_info['test_dir']}/{cf_path}/{cfiles[num].split('/')[-1]}"):
+                if os.path.islink(
+                    f"{user_info['test_dir']}/{cf_path}/{cfiles[num].split('/')[-1]}"
+                ):
                     num = 1
                 subpaths.append(f"{cf_path}/{cfiles[num].split('/')[-1]}")
                 break
@@ -565,7 +576,7 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
     # Remove run directory from the targets
     subpaths_source = subpaths
     subpaths_target = []
-    datestamp_format = re.compile(r'_[\d]{8}-[\d]{8}$')
+    datestamp_format = re.compile(r"_[\d]{8}-[\d]{8}$")
     for sp in subpaths:
         sp_t = ""
         pieces = sp.split("/")
@@ -646,9 +657,9 @@ def save_files(scripts_info, user_choice):
                 f"Would you like to save the files in the '{last_tested_dir}' folder for later "
                 + "comparisson and/or committing to GitHub?[y/n]: "
             )
-            if save=="y":
+            if save == "y":
                 not_answered = False
-            elif save=="n":
+            elif save == "n":
                 logger.info(f"No files will be saved in '{last_tested_dir}'")
                 not_answered = False
                 return
@@ -676,30 +687,47 @@ def save_files(scripts_info, user_choice):
         with open(model_config, "r") as c:
             config_test = yaml.load(c, Loader=yaml.FullLoader)
         compare_files_comp = copy.deepcopy(compare_files["comp"])
-        compare_files_comp.extend(config_test.get("comp", {}).get(test_type_c, {}).get("compare", []))
+        compare_files_comp.extend(
+            config_test.get("comp", {}).get(test_type_c, {}).get("compare", [])
+        )
         compare_files_run = copy.deepcopy(compare_files["run"])
-        compare_files_run.extend(config_test.get("run", {}).get(test_type_r, {}).get("compare", []))
+        compare_files_run.extend(
+            config_test.get("run", {}).get(test_type_r, {}).get("compare", [])
+        )
         # Loop through scripts
         for script, v in scripts.items():
             version = v["version"]
             # Loop through comp and run
             for mode in ["comp", "run"]:
-                if mode=="comp":
+                if mode == "comp":
                     this_compare_files = compare_files_comp
                     subfolder = f"{model}-{version}"
-                elif mode=="run":
+                elif mode == "run":
                     this_compare_files = compare_files_run
                     subfolder = f"{script}"
                 this_test_dir = f"{mode}/{model}/{subfolder}/"
                 # Loop through comparefiles
                 for cfile in this_compare_files:
-                    subpaths_source, subpaths_target = get_rel_paths_compare_files(cfile, this_test_dir)
+                    subpaths_source, subpaths_target = get_rel_paths_compare_files(
+                        cfile, this_test_dir
+                    )
                     for sp, sp_t in zip(subpaths_source, subpaths_target):
                         if os.path.isfile(f"{last_tested_dir}/{sp_t}"):
-                            logger.debug(f"\t'{sp_t}' file in '{last_tested_dir}' will be overwritten")
-                        if not os.path.isdir(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}")):
-                            os.makedirs(os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}"))
-                        shutil.copy2(f"{user_info['test_dir']}/{sp}", f"{last_tested_dir}/{this_computer}/{sp_t}")
+                            logger.debug(
+                                f"\t'{sp_t}' file in '{last_tested_dir}' will be overwritten"
+                            )
+                        if not os.path.isdir(
+                            os.path.dirname(f"{last_tested_dir}/{this_computer}/{sp_t}")
+                        ):
+                            os.makedirs(
+                                os.path.dirname(
+                                    f"{last_tested_dir}/{this_computer}/{sp_t}"
+                                )
+                            )
+                        shutil.copy2(
+                            f"{user_info['test_dir']}/{sp}",
+                            f"{last_tested_dir}/{this_computer}/{sp_t}",
+                        )
     # Load current state
     with open(f"{script_dir}/state.yaml", "r") as st:
         current_state = yaml.load(st, Loader=yaml.FullLoader)
@@ -713,7 +741,7 @@ def save_files(scripts_info, user_choice):
 
 
 def print_results(results):
-    colorama.init(autoreset = True)
+    colorama.init(autoreset=True)
 
     print()
     print()
@@ -734,7 +762,9 @@ def print_results(results):
                         run = f"{colorama.Fore.GREEN}runs"
                     else:
                         run = f"{colorama.Fore.RED}run failed"
-                    print(f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}")
+                    print(
+                        f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
+                    )
     print()
     print()
 
@@ -750,11 +780,20 @@ def format_results(scripts_info, this_computer):
             results[model][version] = results[model].get(version, {})
             results[model][version][script] = results[model][version].get(script, {})
             state = v["state"]
-            compilation = state["comp"] and state["comp_files"] and state.get("comp_files_identical", True)
-            run = state["run_finished"] and state["run_files"] and state["submission"] and state.get("submission_files_identical", True)
+            compilation = (
+                state["comp"]
+                and state["comp_files"]
+                and state.get("comp_files_identical", True)
+            )
+            run = (
+                state["run_finished"]
+                and state["run_files"]
+                and state["submission"]
+                and state.get("submission_files_identical", True)
+            )
             results[model][version][script][this_computer] = {
                 "compilation": compilation,
-                "run": run
+                "run": run,
             }
 
     return results
@@ -762,7 +801,7 @@ def format_results(scripts_info, this_computer):
 
 def sort_dict(dict_to_sort):
     if isinstance(dict_to_sort, dict):
-        dict_to_sort = {key:dict_to_sort[key] for key in sorted(dict_to_sort.keys())}
+        dict_to_sort = {key: dict_to_sort[key] for key in sorted(dict_to_sort.keys())}
         for key, value in dict_to_sort.items():
             dict_to_sort[key] = sort_dict(value)
 
@@ -772,7 +811,7 @@ def sort_dict(dict_to_sort):
 #######################################################################################
 # SCRIPT
 #######################################################################################i
-if __name__=="__main__":
+if __name__ == "__main__":
     # Parsing
     parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
     parser.add_argument(
@@ -786,7 +825,11 @@ if __name__=="__main__":
         "-c", "--check", default=False, help="Check test", action="store_true"
     )
     parser.add_argument(
-        "-d", "--delete", default=False, help="Delete previous tests", action="store_true"
+        "-d",
+        "--delete",
+        default=False,
+        help="Delete previous tests",
+        action="store_true",
     )
     parser.add_argument(
         "-k",
@@ -802,10 +845,13 @@ if __name__=="__main__":
         help="Save files for comparisson in 'last_tested' folder",
     )
     parser.add_argument(
-        "-t", "--state", default=False, help="Print the state stored in state.yaml", action="store_true"
+        "-t",
+        "--state",
+        default=False,
+        help="Print the state stored in state.yaml",
+        action="store_true",
     )
-    
-    
+
     args = vars(parser.parse_args())
     ignore_user_info = args["no_user"]
     actually_compile = not args["check"]
@@ -814,68 +860,69 @@ if __name__=="__main__":
     keep_run_folders = args["keep"]
     save_flag = args["save"]
     print_state = args["state"]
-    
+
     # Bold strings
     bs = "\033[1m"
     be = "\033[0m"
-    
+
     script_dir = os.path.dirname(os.path.realpath(__file__))
     runscripts_dir = f"{script_dir}/runscripts/"
     current_dir = os.getcwd()
     last_tested_dir = f"{current_dir}/last_tested/"
-    this_computer = (determine_computer_from_hostname().split("/")[-1].replace(".yaml", ""))
-    
+    this_computer = (
+        determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
+    )
+
     # Predefined for later
     user_scripts = dict(comp={}, run={})
-    
+
     # Print state if necessary
     if print_state:
         with open(f"{script_dir}/state.yaml", "r") as st:
             current_state = yaml.load(st, Loader=yaml.FullLoader)
         print_results(current_state)
         sys.exit(1)
-    
+
     # Get user info for testing
     if not ignore_user_info:
         user_info = user_config()
     else:
         user_info = None
-    
+
     # Define lines to be ignored during comparison
     with open(f"{script_dir}/ignore_compare.yaml", "r") as i:
         ignore = yaml.load(i, Loader=yaml.FullLoader)
-    
+
     # Define default files for comparisson
     compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}
-    
+
     logger.debug(f"User info: {user_info}")
     logger.debug(f"Actually compile: {actually_compile}")
     logger.debug(f"Actually run: {actually_run}")
-    
-    
+
     # Gather scripts
     scripts_info = get_scripts()
-    
+
     # Complete scripts_info
     scripts_info = read_info_from_rs(scripts_info)
-    
+
     # Delete previous test
     if delete_tests:
         del_prev_tests(scripts_info)
-    
+
     # Compile
     comp_test(scripts_info, actually_compile)
-    
+
     # Run
     run_test(scripts_info, actually_run)
-    
+
     # Print results
     print_results(format_results(scripts_info, this_computer))
-    
+
     # Save files
-    if save_flag=="Not defined":
+    if save_flag == "Not defined":
         save_files(scripts_info, False)
-    elif save_flag=="true" or save_flag=="True":
+    elif save_flag == "true" or save_flag == "True":
         save_files(scripts_info, True)
-    
-    #yprint(scripts_info)
+
+    # yprint(scripts_info)
