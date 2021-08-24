@@ -408,7 +408,8 @@ def run_test(scripts_info, actually_run):
 def check(mode, model, version, out, script, v, ignore):
     success = True
     mode_name = {"comp": "compilation", "submission": "submission", "run": "runtime"}
-    # Load config
+
+    # Load config for this mode
     with open(f"{os.path.dirname(v['path'])}/config.yaml", "r") as c:
         config_test = yaml.load(c, Loader=yaml.FullLoader)
     if mode == "submission":
@@ -420,7 +421,8 @@ def check(mode, model, version, out, script, v, ignore):
             f"Missing '{mode}' section in '{os.path.dirname(v['path'])}/config.yaml'!"
         )
     config_test = config_test[config_mode]
-    # Check for files that should exist
+
+    # Set mode variables
     if mode == "comp":
         if actually_compile:
             test_type = "actual"
@@ -437,31 +439,36 @@ def check(mode, model, version, out, script, v, ignore):
         subfolder = script
     elif mode == "submission":
         # Do not perform the file checks before the simulation is finished
-        actually_do = False
-        subfolder = script
         if actually_run:
             test_type = "actual"
         else:
             test_type = "check"
-        errors = config_test.get(test_type, {}).get("errors", [])
-        errors.extend(["Traceback (most recent call last):", "ERROR"])
-        for error in errors:
-            if error in out:
-                logger.error(f"\t\tError during {mode_name[mode]}!\n\n{out}")
-                success = False
-        v["state"][mode] = success
-    # Check for missing files and errors during an actual operation (not a check)
-    if actually_do:
+        actually_do = False
+        subfolder = script
+
+    # Check for errors
+    if actually_do or mode == "submission":
         # Check for errors in the output
         errors = config_test.get(test_type, {}).get("errors", [])
+        # Add specific errors
         if mode == "comp":
             errors.append("errors occurred!")
+        if mode == "submission":
+            errors.extend(["Traceback (most recent call last):", "ERROR"])
+        # Loop through errors
         for error in errors:
             if error in out:
                 logger.error(f"\t\tError during {mode_name[mode]}!\n\n{out}")
                 success = False
         if mode != "run":
             v["state"][mode] = success
+    else:
+        if mode == "comp":
+            # No need to check for this in check mode
+            v["state"][mode] = success
+
+    # Check for missing files during an actual operation (not a check, not submission)
+    if actually_do:
         # Check if files exist
         files_checked = exist_files(
             config_test.get(test_type, {}).get("files", []),
@@ -782,12 +789,12 @@ def format_results(scripts_info, this_computer):
             state = v["state"]
             compilation = (
                 state["comp"]
-                and state["comp_files"]
+                and state.get("comp_files", True)
                 and state.get("comp_files_identical", True)
             )
             run = (
-                state["run_finished"]
-                and state["run_files"]
+                state.get("run_finished", True)
+                and state.get("run_files", True)
                 and state["submission"]
                 and state.get("submission_files_identical", True)
             )
