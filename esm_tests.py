@@ -337,10 +337,10 @@ def run_test(scripts_info, actually_run):
             v = scripts_info[model][script]
             progress = round(subc / total_sub * 100, 1)
             exp_dir = f"{user_info['test_dir']}/run/{model}/{script}/"
-            exp_dir_scripts = f"{exp_dir}/scripts/"
-            for f in os.listdir(exp_dir_scripts):
-                if "monitoring_file" in f and ".out" in f:
-                    with open(f"{exp_dir_scripts}/{f}") as m:
+            exp_dir_log = f"{exp_dir}/log/"
+            for f in os.listdir(exp_dir_log):
+                if "_tidy_" in f and ".log" in f:
+                    with open(f"{exp_dir_log}/{f}") as m:
                         monitoring_out = m.read()
                         if (
                             "Reached the end of the simulation, quitting"
