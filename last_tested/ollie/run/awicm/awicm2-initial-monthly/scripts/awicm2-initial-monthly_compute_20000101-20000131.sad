@@ -2,10 +2,9 @@
 #SBATCH --partition=mpp
 #SBATCH --time=00:15:00
 #SBATCH --ntasks=864
-#SBATCH --output=/work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//scripts/awicm2-initial-monthly_compute_20000101-20000131_%j.log --error=/work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//scripts/awicm2-initial-monthly_compute_20000101-20000131_%j.log
+#SBATCH --output=/work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/log/awicm2-initial-monthly_awicm_compute_20000101-20000131.log --error=/work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/log/awicm2-initial-monthly_awicm_compute_20000101-20000131.log
 #SBATCH --job-name=awicm2-initial-monthly
 #SBATCH --mail-type=NONE
-#SBATCH --exclusive
 
 module purge
 module load cmake
@@ -51,13 +50,23 @@ export ESM_TESTING_DIR=/work/ollie/mandresm/testing//run/awicm/
 export MODEL_DIR=/work/ollie/mandresm/testing//comp/awicm/awicm-2.0
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
+
 # Set stack size to unlimited
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//run_20000101-20000131/work/
-echo $(date +%c) : compute 1 2000-01-01T00:00:00 169341 - start >> /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//log//awicm2-initial-monthly_awicm.log
-time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun &
+echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 153989 - start >> /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/log//awicm2-initial-monthly_awicm.log
+
+cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/run_20000101-20000131/work/
+time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun 2>&1 &
+
+# Call to esm_runscript to start subjobs:
+# ['tidy']
 process=$! 
-cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//scripts/
-esm_runscripts awicm2-initial-monthly.yaml -e awicm2-initial-monthly -t tidy_and_resubmit -p ${process} -j compute -v --no-motd  --open-run
+# Comment the following line if you don't want esm_runscripts to restart:
+cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/scripts/
+esm_runscripts awicm2-initial-monthly.yaml -e awicm2-initial-monthly -t observe_compute -p ${process} -s 20000101 -r 1 -v  --open-run
+
+echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 153989 - done >> /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly/log//awicm2-initial-monthly_awicm.log
+
+wait

@@ -2,10 +2,9 @@
 #SBATCH --partition=mpp
 #SBATCH --time=00:10:00
 #SBATCH --ntasks=288
-#SBATCH --output=/work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily//scripts/fesom-recom1.4-restart-daily_compute_19580103-19580103_%j.log --error=/work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily//scripts/fesom-recom1.4-restart-daily_compute_19580103-19580103_%j.log
+#SBATCH --output=/work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/log/fesom-recom1.4-restart-daily_fesom-recom_compute_19580103-19580103.log --error=/work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/log/fesom-recom1.4-restart-daily_fesom-recom_compute_19580103-19580103.log
 #SBATCH --job-name=fesom-recom1.4-restart-daily
 #SBATCH --mail-type=NONE
-#SBATCH --exclusive
 
 module purge
 module load cmake
@@ -50,13 +49,23 @@ export ESM_TESTING_DIR=/work/ollie/mandresm/testing//run/fesom-recom/
 export MODEL_DIR=/work/ollie/mandresm/testing//comp/fesom-recom/fesom-recom-1.4
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
+
 # Set stack size to unlimited
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-cd /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily//run_19580103-19580103/work/
-echo $(date +%c) : compute 1 1958-01-03T00:00:00 150561 - start >> /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily//log//fesom-recom1.4-restart-daily_fesom-recom.log
-time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun &
+echo $(date +"%a %b  %e %T %Y") : compute 1 1958-01-03T00:00:00 134919 - start >> /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/log//fesom-recom1.4-restart-daily_fesom-recom.log
+
+cd /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/run_19580103-19580103/work/
+time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun 2>&1 &
+
+# Call to esm_runscript to start subjobs:
+# ['tidy']
 process=$! 
-cd /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily//scripts/
-esm_runscripts fesom-recom1.4-restart-daily.yaml -e fesom-recom1.4-restart-daily -t tidy_and_resubmit -p ${process} -j compute -v --no-motd  --open-run
+# Comment the following line if you don't want esm_runscripts to restart:
+cd /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/scripts/
+esm_runscripts fesom-recom1.4-restart-daily.yaml -e fesom-recom1.4-restart-daily -t observe_compute -p ${process} -s 19580103 -r 1 -v  --open-run
+
+echo $(date +"%a %b  %e %T %Y") : compute 1 1958-01-03T00:00:00 134919 - done >> /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/log//fesom-recom1.4-restart-daily_fesom-recom.log
+
+wait

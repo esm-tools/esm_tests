@@ -1,5 +1,6 @@
 .sad:
     - "echo $(date +%c) : compute"
+    - 'echo $(date +"%a %b  %e %T %Y") :'
 finished_config:
     - "    jobid: "
     - "    check: "
