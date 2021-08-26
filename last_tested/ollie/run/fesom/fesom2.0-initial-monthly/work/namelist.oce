@@ -37,7 +37,7 @@
     k_ver = 1e-05
     k_hor = 3000.0
     surf_relax_t = 0.0
-    surf_relax_s = 1.929e-06
+    surf_relax_s = 0.0
     balance_salt_water = .true.
     clim_relax = 0.0
     ref_sss_local = .true.

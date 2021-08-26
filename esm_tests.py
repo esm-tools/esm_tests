@@ -650,6 +650,7 @@ def print_diff(sscript, tscript, name, ignore_lines):
             pdifferences += f"\t\t{line}"
 
         logger.info(f"\n\tDifferences in {name}:\n{pdifferences}\n")
+        #input("Press enter to continue...")
         identical = False
 
     return identical, differences

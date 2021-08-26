@@ -3,7 +3,7 @@ awicm:
     awicm2-initial-monthly:
       ollie:
         compilation: true
-        run: true
+        run: false
   CMIP6:
     awicm1-initial-monthly:
       ollie:
@@ -14,19 +14,19 @@ fesom:
     fesom2.0-initial-monthly:
       ollie:
         compilation: true
-        run: true
+        run: false
   2.1:
     fesom2.1-initial-monthly:
       ollie:
         compilation: true
-        run: true
+        run: false
 fesom-recom:
   1.4:
     fesom-recom1.4-initial-daily:
       ollie:
         compilation: true
-        run: true
+        run: false
     fesom-recom1.4-restart-daily:
       ollie:
         compilation: true
-        run: true
+        run: false
