@@ -6,7 +6,7 @@ awicm:
         run: true
       ollie:
         compilation: true
-        run: true
+        run: false
   CMIP6:
     awicm1-initial-monthly:
       ollie:

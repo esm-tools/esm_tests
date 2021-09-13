@@ -1586,7 +1586,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 169341
+    jobid: 190415
     jobtype: compute
     last_jobtype: command_line
     last_run_datestamp: 19991201-19991231
@@ -2117,7 +2117,7 @@ oasis3mct:
     - 3
     - 4
     - 4.0-oifsdeck
-    branch: 2.8
+    branch: '2.8'
     cf_name_dir: /work/ollie/mandresm/testing//comp/awicm/awicm-2.0/oasis
     clean_command: rm -rf build CMakeCache.txt include lib/libpsmile.a lib/libscrip.a lib/libmct.a lib/libmpeu.a
     comp_command: mkdir -p build; cd build; cmake ..;   make -j 1; mkdir -p ../include/; cp lib/psmile/libpsmile.a lib/psmile/mct/libmct.a lib/psmile/mct/mpeu/libmpeu.a lib/psmile/scrip/libscrip.a ../lib; cp lib/psmile/mod_oasis*mod ../include

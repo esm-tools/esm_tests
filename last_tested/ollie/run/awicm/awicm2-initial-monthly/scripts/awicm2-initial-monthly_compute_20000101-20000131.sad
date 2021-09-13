@@ -56,7 +56,7 @@ ulimit -s unlimited
 # 3...2...1...Liftoff!
 
 cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//run_20000101-20000131/work/
-echo $(date +%c) : compute 1 2000-01-01T00:00:00 169341 - start >> /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//log//awicm2-initial-monthly_awicm.log
+echo $(date +%c) : compute 1 2000-01-01T00:00:00 190415 - start >> /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//log//awicm2-initial-monthly_awicm.log
 time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun &
 process=$! 
 cd /work/ollie/mandresm/testing//run/awicm//awicm2-initial-monthly//scripts/
