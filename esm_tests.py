@@ -91,7 +91,7 @@ def get_scripts():
                     test_all
                     or isinstance(test_info.get(model), str)
                     or script in test_info.get(model, [])
-                ):
+                ) and os.path.isfile(f"{runscripts_dir}/{model}/{script}"):
                     if script != "config.yaml" and ".swp" not in script:
                         scripts_info[model][script.replace(".yaml", "")] = {}
                         scripts_info[model][script.replace(".yaml", "")][
@@ -174,6 +174,24 @@ def deep_update(d, u):
     return d
 
 
+def copy_comp_files4check_runs(script, script_info, target_dir):
+    files4check_dir = f"{os.path.dirname(script_info['path'])}/comp_files4check_runs/{script}"
+    if os.path.isdir(files4check_dir):
+        source_dir = f"{files4check_dir}/{os.listdir(files4check_dir)[0]}"
+        combine_folders(source_dir, target_dir)
+
+
+def combine_folders(source_dir, target_dir):
+    if not os.path.isfile(target_dir):
+        if os.path.isdir(source_dir):
+            if not os.path.isdir(target_dir):
+                os.mkdir(target_dir)
+            for folder in os.listdir(source_dir):
+                combine_folders(f"{source_dir}/{folder}", f"{target_dir}/{folder}")
+        if os.path.isfile(source_dir):
+            shutil.copy2(source_dir, target_dir)
+
+
 #######################################################################################
 # TESTS
 #######################################################################################
@@ -234,6 +252,14 @@ def comp_test(scripts_info, actually_compile):
                     os.mkdir(prim_f)
                     for folder in folders:
                         os.mkdir(prim_f + "/" + folder)
+
+                    # Get files from the esm_test/runscripts/<model>/comp_files4check_runs
+                    # (i.e. namelists that are hosted in another repository could be
+                    # place there so that checks can run successfully without having to
+                    # download the code).
+                    copy_comp_files4check_runs(
+                        script, v, f"{general_model_dir}/{prim_f}"
+                    )
 
                 # Compile
                 if actually_compile:
