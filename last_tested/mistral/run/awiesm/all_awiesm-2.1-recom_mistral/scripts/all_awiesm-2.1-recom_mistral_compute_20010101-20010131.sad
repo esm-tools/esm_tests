@@ -73,7 +73,7 @@ ulimit -s unlimited
 # 3...2...1...Liftoff!
 
 cd /work/ab0246/a270152/testing//run/awiesm//all_awiesm-2.1-recom_mistral//run_20010101-20010131/work/
-echo $(date +%c) : compute 1 2001-01-01T00:00:00 6390 - start >> /work/ab0246/a270152/testing//run/awiesm//all_awiesm-2.1-recom_mistral//log//all_awiesm-2.1-recom_mistral_awiesm.log
+echo $(date +%c) : compute 1 2001-01-01T00:00:00 41538 - start >> /work/ab0246/a270152/testing//run/awiesm//all_awiesm-2.1-recom_mistral//log//all_awiesm-2.1-recom_mistral_awiesm.log
 time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun &
 process=$! 
 cd /work/ab0246/a270152/testing//run/awiesm//all_awiesm-2.1-recom_mistral//scripts/

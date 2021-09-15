@@ -1699,16 +1699,16 @@ general:
     base_dir: /work/ab0246/a270152/testing//run/awiesm/
     batch: slurm
     calendar: esm_calendar object with allowed leap years
-    check: false
+    check: true
     command_line_config:
-        check: false
+        check: true
         expid: all_awiesm-2.1-recom_mistral
         inspect: null
         jobtype: compute
         last_jobtype: command_line
         launcher_pid: -666
         no_motd: true
-        original_command: all_awiesm-2.1-recom_mistral.yaml -e all_awiesm-2.1-recom_mistral --open-run --no-motd
+        original_command: all_awiesm-2.1-recom_mistral.yaml -e all_awiesm-2.1-recom_mistral --open-run -c --no-motd
         profile: false
         runscript_abspath: /mnt/lustre02/work/ab0246/a270152/testing/run/awiesm/all_awiesm-2.1-recom_mistral/scripts/all_awiesm-2.1-recom_mistral.yaml
         scriptname: all_awiesm-2.1-recom_mistral.yaml
@@ -1868,7 +1868,7 @@ general:
     - recom
     initial_date: '2001-01-01T00:00:00'
     inspect: null
-    jobid: 6390
+    jobid: 41538
     jobtype: compute
     last_jobtype: command_line
     last_run_datestamp: 20001201-20001231
@@ -1890,7 +1890,7 @@ general:
     no_motd: true
     nsecond: 0
     nyear: 0
-    original_command: all_awiesm-2.1-recom_mistral.yaml -e all_awiesm-2.1-recom_mistral --open-run --no-motd
+    original_command: all_awiesm-2.1-recom_mistral.yaml -e all_awiesm-2.1-recom_mistral --open-run -c --no-motd
     out_filetypes:
     - analysis
     - log
@@ -2429,7 +2429,7 @@ oasis3mct:
     - 3
     - 4
     - 4.0-oifsdeck
-    branch: 2.8
+    branch: '2.8'
     cf_name_dir: /work/ab0246/a270152/testing//comp/awiesm/awiesm-2.1-recom/oasis
     clean_command: rm -rf build CMakeCache.txt include lib/libpsmile.a lib/libscrip.a lib/libmct.a lib/libmpeu.a
     comp_command: mkdir -p build; cd build; cmake ..;   make -j 1; mkdir -p ../include/; cp lib/psmile/libpsmile.a lib/psmile/mct/libmct.a lib/psmile/mct/mpeu/libmpeu.a lib/psmile/scrip/libscrip.a ../lib; cp lib/psmile/mod_oasis*mod ../include
