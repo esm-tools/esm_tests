@@ -1,3 +1,8 @@
+# MA: This script is not used anymore, it was made on the first place to test the
+# environments when I did the refactorization of esm_environments. esm_tests took
+# inspiration from some of the functions here, and I decided to keep it here
+# just for the record.
+
 import os
 import argparse
 import subprocess
