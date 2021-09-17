@@ -20,12 +20,19 @@ from esm_runscripts import color_diff
 from esm_parser import determine_computer_from_hostname
 
 
+# Bold strings
+bs = "\033[1m"
+be = "\033[0m"
+
+# Define default files for comparisson
+compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}
+
 #######################################################################################
 # INITIALIZATION
 #######################################################################################
-def user_config():
+def user_config(info):
     # Check for user configuration file
-    user_config = f"{script_dir}/user_config.yaml"
+    user_config = f"{info['script_dir']}/user_config.yaml"
     print()
     if not os.path.isfile(user_config):
         # Make the user configuration file
@@ -58,11 +65,12 @@ def user_config():
     return user_info
 
 
-def get_scripts():
+def get_scripts(info):
+    runscripts_dir = f"{info['script_dir']}/runscripts/"
     scripts_info = {}
     ns = 0
     # Load test info
-    test_config = f"{script_dir}/test_config.yaml"
+    test_config = f"{info['script_dir']}/test_config.yaml"
     if os.path.isfile(test_config):
         with open(test_config, "r") as t:
             test_info = yaml.load(t, Loader=yaml.FullLoader)
@@ -82,7 +90,7 @@ def get_scripts():
                 config_test = yaml.load(c, Loader=yaml.FullLoader)
             computers = config_test.get("computers", False)
             if computers:
-                if this_computer not in computers:
+                if info["this_computer"] not in computers:
                     continue
 
             scripts_info[model] = {}
@@ -116,7 +124,8 @@ def read_info_from_rs(scripts_info):
     return scripts_info
 
 
-def del_prev_tests(scripts_info):
+def del_prev_tests(info, scripts_info):
+    user_info = info["user"]
     logger.debug("Deleting previous tests")
     for model, scripts in scripts_info.items():
         if model == "general":
@@ -195,8 +204,9 @@ def combine_folders(source_dir, target_dir):
 #######################################################################################
 # TESTS
 #######################################################################################
-def comp_test(scripts_info, actually_compile):
+def comp_test(scripts_info, info):
     cd_format = re.compile("         cd (.*)")
+    user_info = info["user"]
 
     c = 0
     for model, scripts in scripts_info.items():
@@ -221,7 +231,7 @@ def comp_test(scripts_info, actually_compile):
                     out = o.read()
             else:
                 # Gets the source code if actual compilation is required
-                if actually_compile:
+                if info["actually_compile"]:
                     get_command = f"esm_master get-{model}-{version} --no-motd"
                     logger.info("\t\tDownloading")
                     out = sh(get_command)
@@ -262,7 +272,7 @@ def comp_test(scripts_info, actually_compile):
                     )
 
                 # Compile
-                if actually_compile:
+                if info["actually_compile"]:
                     logger.info("\t\tCompiling")
                 else:
                     logger.info("\t\tWritting compilation scripts")
@@ -282,14 +292,16 @@ def comp_test(scripts_info, actually_compile):
                         os.remove(f"{general_model_dir}/{f}")
 
             # Checks
-            success = check("comp", model, version, out, script, v, ignore)
+            success = check(info, "comp", model, version, out, script, v)
             if success:
                 logger.info("\t\tSuccess!")
 
     return scripts_info
 
 
-def run_test(scripts_info, actually_run):
+def run_test(scripts_info, info):
+    user_info = info["user"]
+    actually_run = info["actually_run"]
     c = 0
     submitted = []
     # Loop through tests
@@ -343,7 +355,7 @@ def run_test(scripts_info, actually_run):
                     submitted.append((model, script))
 
             # Check submission
-            success = check("submission", model, version, out, script, v, ignore)
+            success = check(info, "submission", model, version, out, script, v)
 
     # Check if simulations are finished
     total_sub = len(submitted)
@@ -380,7 +392,7 @@ def run_test(scripts_info, actually_run):
                             subc += 1
                             v["state"]["run_finished"] = True
                             success = check(
-                                "run", model, version, "", script, v, ignore
+                                info, "run", model, version, "", script, v,
                             )
                         elif "ERROR:" in monitoring_out:
                             logger.info(
@@ -391,9 +403,9 @@ def run_test(scripts_info, actually_run):
                             subc += 1
                             v["state"]["run_finished"] = False
                             success = check(
-                                "run", model, version, "", script, v, ignore
+                                info, "run", model, version, "", script, v,
                             )
-            if not keep_run_folders:
+            if not info["keep_run_folders"]:
                 folders_to_remove = [
                     "run_",
                     "restart",
@@ -431,9 +443,13 @@ def run_test(scripts_info, actually_run):
 #######################################################################################
 # CHECKS
 #######################################################################################
-def check(mode, model, version, out, script, v, ignore):
+def check(info, mode, model, version, out, script, v):
     success = True
     mode_name = {"comp": "compilation", "submission": "submission", "run": "runtime"}
+    last_tested_dir = info["last_tested_dir"]
+    this_computer = info["this_computer"]
+    user_info = info["user"]
+    actually_run = info["actually_run"]
 
     # Load config for this mode
     with open(f"{os.path.dirname(v['path'])}/config.yaml", "r") as c:
@@ -450,11 +466,11 @@ def check(mode, model, version, out, script, v, ignore):
 
     # Set mode variables
     if mode == "comp":
-        if actually_compile:
+        if info["actually_compile"]:
             test_type = "actual"
         else:
             test_type = "check"
-        actually_do = actually_compile
+        actually_do = info["actually_compile"]
         subfolder = f"{model}-{version}"
     elif mode == "run":
         if actually_run:
@@ -509,9 +525,9 @@ def check(mode, model, version, out, script, v, ignore):
     this_test_dir = f"{config_mode}/{model}/{subfolder}/"
     v["state"][f"{mode}_files_identical"] = True
     for cfile in this_compare_files:
-        ignore_lines = ignore.get(cfile, [])
+        ignore_lines = info["ignore"].get(cfile, [])
         subpaths_source, subpaths_target = get_rel_paths_compare_files(
-            cfile, this_test_dir
+            info, cfile, this_test_dir
         )
         for sp, sp_t in zip(subpaths_source, subpaths_target):
             if not os.path.isfile(f"{user_info['test_dir']}/{sp}"):
@@ -557,7 +573,8 @@ def exist_files(files, path):
     return files_checked
 
 
-def get_rel_paths_compare_files(cfile, this_test_dir):
+def get_rel_paths_compare_files(info, cfile, this_test_dir):
+    user_info = info["user"]
     subpaths = []
     if cfile == "comp-":
         for f in os.listdir(f"{user_info['test_dir']}/{this_test_dir}"):
@@ -590,7 +607,7 @@ def get_rel_paths_compare_files(cfile, this_test_dir):
                 break
     elif cfile == "namelists":
         # Get path of the finished_config
-        s_config_yaml, _ = get_rel_paths_compare_files("finished_config", this_test_dir)
+        s_config_yaml, _ = get_rel_paths_compare_files(info, "finished_config", this_test_dir)
         namelists = extract_namelists(f"{user_info['test_dir']}/{s_config_yaml[0]}")
         ldir = os.listdir(f"{user_info['test_dir']}/{this_test_dir}")
         ldir.sort()
@@ -681,7 +698,12 @@ def print_diff(sscript, tscript, name, ignore_lines):
     return identical, differences
 
 
-def save_files(scripts_info, user_choice):
+def save_files(scripts_info, info, user_choice):
+    actually_run = info["actually_run"]
+    user_info = info["user"]
+    last_tested_dir = info["last_tested_dir"]
+    runscripts_dir = f"{info['script_dir']}/runscripts/"
+    this_computer = info["this_computer"]
     if not user_choice:
         not_answered = True
         while not_answered:
@@ -700,7 +722,7 @@ def save_files(scripts_info, user_choice):
                 print(f"'{save}' is not a valid answer!")
 
     # Select test types
-    if actually_compile:
+    if info["actually_compile"]:
         test_type_c = "actual"
     else:
         test_type_c = "check"
@@ -742,7 +764,7 @@ def save_files(scripts_info, user_choice):
                 # Loop through comparefiles
                 for cfile in this_compare_files:
                     subpaths_source, subpaths_target = get_rel_paths_compare_files(
-                        cfile, this_test_dir
+                        info, cfile, this_test_dir
                     )
                     for sp, sp_t in zip(subpaths_source, subpaths_target):
                         if os.path.isfile(f"{last_tested_dir}/{sp_t}"):
@@ -762,13 +784,13 @@ def save_files(scripts_info, user_choice):
                             f"{last_tested_dir}/{this_computer}/{sp_t}",
                         )
     # Load current state
-    with open(f"{script_dir}/state.yaml", "r") as st:
+    with open(f"{info['script_dir']}/state.yaml", "r") as st:
         current_state = yaml.load(st, Loader=yaml.FullLoader)
     # Update with this results
-    results = format_results(scripts_info, this_computer)
+    results = format_results(info, scripts_info)
     current_state = deep_update(current_state, results)
     current_state = sort_dict(current_state)
-    with open(f"{script_dir}/state.yaml", "w") as st:
+    with open(f"{info['script_dir']}/state.yaml", "w") as st:
         state = yaml.dump(current_state)
         st.write(state)
 
@@ -802,7 +824,7 @@ def print_results(results):
     print()
 
 
-def format_results(scripts_info, this_computer):
+def format_results(info, scripts_info):
     results = {}
     for model, scripts in scripts_info.items():
         if model == "general":
@@ -824,7 +846,7 @@ def format_results(scripts_info, this_computer):
                 and state["submission"]
                 and state.get("submission_files_identical", True)
             )
-            results[model][version][script][this_computer] = {
+            results[model][version][script][info["this_computer"]] = {
                 "compilation": compilation,
                 "run": run,
             }
@@ -844,123 +866,4 @@ def sort_dict(dict_to_sort):
 #######################################################################################
 # SCRIPT
 #######################################################################################i
-if __name__ == "__main__":
-    # Parsing
-    parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
-    parser.add_argument(
-        "-n",
-        "--no-user",
-        default=False,
-        help="Avoid loading user config",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-c",
-        "--check",
-        default=False,
-        help="Check mode on (does not compile or run, but produces some files that can "
-        + "be compared to previous existing files in 'last_tested' folder)",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-d",
-        "--delete",
-        default=False,
-        help="Delete previous tests",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-k",
-        "--keep",
-        default=False,
-        help="Keep run_, outdata and restart folders for runs",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-s",
-        "--save",
-        default="Not defined",
-        help="Save files for comparisson in 'last_tested' folder",
-    )
-    parser.add_argument(
-        "-t",
-        "--state",
-        default=False,
-        help="Print the state stored in state.yaml",
-        action="store_true",
-    )
 
-    args = vars(parser.parse_args())
-    ignore_user_info = args["no_user"]
-    actually_compile = not args["check"]
-    actually_run = not args["check"]
-    delete_tests = args["delete"]
-    keep_run_folders = args["keep"]
-    save_flag = args["save"]
-    print_state = args["state"]
-
-    # Bold strings
-    bs = "\033[1m"
-    be = "\033[0m"
-
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    runscripts_dir = f"{script_dir}/runscripts/"
-    current_dir = os.getcwd()
-    last_tested_dir = f"{current_dir}/last_tested/"
-    this_computer = (
-        determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
-    )
-
-    # Predefined for later
-    user_scripts = dict(comp={}, run={})
-
-    # Print state if necessary
-    if print_state:
-        with open(f"{script_dir}/state.yaml", "r") as st:
-            current_state = yaml.load(st, Loader=yaml.FullLoader)
-        print_results(current_state)
-        sys.exit(1)
-
-    # Get user info for testing
-    if not ignore_user_info:
-        user_info = user_config()
-    else:
-        user_info = None
-
-    # Define lines to be ignored during comparison
-    with open(f"{script_dir}/ignore_compare.yaml", "r") as i:
-        ignore = yaml.load(i, Loader=yaml.FullLoader)
-
-    # Define default files for comparisson
-    compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}
-
-    logger.debug(f"User info: {user_info}")
-    logger.debug(f"Actually compile: {actually_compile}")
-    logger.debug(f"Actually run: {actually_run}")
-
-    # Gather scripts
-    scripts_info = get_scripts()
-
-    # Complete scripts_info
-    scripts_info = read_info_from_rs(scripts_info)
-
-    # Delete previous test
-    if delete_tests:
-        del_prev_tests(scripts_info)
-
-    # Compile
-    comp_test(scripts_info, actually_compile)
-
-    # Run
-    run_test(scripts_info, actually_run)
-
-    # Print results
-    print_results(format_results(scripts_info, this_computer))
-
-    # Save files
-    if save_flag == "Not defined":
-        save_files(scripts_info, False)
-    elif save_flag == "true" or save_flag == "True":
-        save_files(scripts_info, True)
-
-    # yprint(scripts_info)
