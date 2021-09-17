@@ -1442,16 +1442,16 @@ general:
     base_dir: /work/ollie/mandresm/testing//run/awicm/
     batch: slurm
     calendar: esm_calendar object with allowed leap years
-    check: true
+    check: false
     command_line_config:
-        check: true
+        check: false
         expid: awicm2-initial-monthly
         inspect: null
         jobtype: compute
         last_jobtype: command_line
         launcher_pid: -666
         no_motd: true
-        original_command: awicm2-initial-monthly.yaml -e awicm2-initial-monthly --open-run -c --no-motd
+        original_command: awicm2-initial-monthly.yaml -e awicm2-initial-monthly --open-run --no-motd
         profile: false
         runscript_abspath: /work/ollie/mandresm/testing/run/awicm/awicm2-initial-monthly/scripts/awicm2-initial-monthly.yaml
         scriptname: awicm2-initial-monthly.yaml
@@ -1586,7 +1586,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 190415
+    jobid: 150394
     jobtype: compute
     last_jobtype: command_line
     last_run_datestamp: 19991201-19991231
@@ -1607,7 +1607,7 @@ general:
     no_motd: true
     nsecond: 0
     nyear: 0
-    original_command: awicm2-initial-monthly.yaml -e awicm2-initial-monthly --open-run -c --no-motd
+    original_command: awicm2-initial-monthly.yaml -e awicm2-initial-monthly --open-run --no-motd
     out_filetypes:
     - analysis
     - log
