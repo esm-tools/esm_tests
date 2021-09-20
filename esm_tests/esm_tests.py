@@ -19,6 +19,7 @@ from loguru import logger
 from esm_runscripts import color_diff
 from esm_parser import determine_computer_from_hostname
 
+import esm_tests.read_shipped_data
 
 # Bold strings
 bs = "\033[1m"
@@ -74,16 +75,22 @@ def user_config(info):
 
 
 def get_scripts(info):
-    runscripts_dir = f"{info['script_dir']}/runscripts/"
-    scripts_info = {}
-    ns = 0
-    # Load test info
-    test_config = f"{info['script_dir']}/test_config.yaml"
-    if os.path.isfile(test_config):
-        with open(test_config, "r") as t:
-            test_info = yaml.load(t, Loader=yaml.FullLoader)
-    else:
-        test_info = {}
+    try:
+        runscripts_dir = f"{info['script_dir']}/runscripts/"
+        scripts_info = {}
+        ns = 0
+        # Load test info
+        test_config = f"{info['script_dir']}/test_config.yaml"
+        if os.path.isfile(test_config):
+            with open(test_config, "r") as t:
+                test_info = yaml.load(t, Loader=yaml.FullLoader)
+        else:
+            test_info = {}
+    except FileNotFoundError:
+        # Read from the package
+        try:
+            test_info = read_shipped_data.get_runscripts("test_config.yaml")
+            test_info = yaml.safe_load(test_info)
     if len(test_info) > 0:
         test_all = False
     else:
