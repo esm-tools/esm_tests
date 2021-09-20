@@ -39,8 +39,8 @@ def user_config(info):
         # Make the user configuration file
         answers = {}
         print(
-            "{bs}Welcome to ESM-Tests! Automatic testing for ESM-Tools devs\n"
-            + "**********************************************************{be}\n"
+            f"{bs}Welcome to ESM-Tests! Automatic testing for ESM-Tools devs\n"
+            + f"**********************************************************{be}\n"
             + "Please answer the following questions. If you ever need to change the "
             + "configuration, you can do that in the the esm_tests/user_config.yaml\n"
         )
@@ -59,12 +59,12 @@ def user_config(info):
             )
         except EOFError:
             print("This is probably running on the CI System. We will default to $HOME")
-            answers["test_dir"] = os.environ.get(
-                "HOME"
-            )  # NOTE(PG): Miguel needs to check this if it makes sense or not...
+            answers["test_dir"] = os.getcwd()
         with open(user_config, "w") as uc:
+            logger.debug("Writing file")
             out = yaml.dump(answers)
             uc.write(out)
+            logger.debug(f"Done: {uc}")
 
     # Load the user info
     with open(user_config, "r") as uc:
@@ -77,6 +77,8 @@ def user_config(info):
 
 
 def get_scripts(info):
+    for key, value in info.items():
+        logger.debug(f"{key}={value}")
     try:
         runscripts_dir = f"{info['script_dir']}/runscripts/"
         scripts_info = {}
@@ -91,7 +93,7 @@ def get_scripts(info):
     except FileNotFoundError:
         # Read from the package
         try:
-            test_info = read_shipped_data.get_runscripts("test_config.yaml")
+            test_info = esm_tests.read_shipped_data.get_runscripts("test_config.yaml")
             test_info = yaml.safe_load(test_info)
         except FileNotFoundError:  # NOTE(PG): Not sure if this is the right one to catch...
             test_info = {}

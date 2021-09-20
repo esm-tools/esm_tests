@@ -4,6 +4,9 @@ A small wrapper that combines the shell interface and the Python interface
 """
 
 # Import from Python Standard Library
+import argparse
+from loguru import logger
+
 from .esm_tests import *
 import esm_tests.read_shipped_data
 
@@ -11,6 +14,9 @@ import os
 
 
 def main():
+
+    if os.environ.get("CI", False):
+        logger.add("out.log", backtrace=True, diagnose=True)
 
     # Parsing
     parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
