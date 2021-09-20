@@ -108,9 +108,9 @@ def main():
             print(e)
             raise
 
-    logger.debug(f"User info: {info['user']}")
-    logger.debug(f"Actually compile: {info['actually_compile']}")
-    logger.debug(f"Actually run: {info['actually_run']}")
+    logger.debug(f"User info: {info.get('user')}")
+    logger.debug(f"Actually compile: {info.get('actually_compile')}")
+    logger.debug(f"Actually run: {info.get('actually_run')}")
 
     # Gather scripts
     scripts_info = get_scripts(info)
