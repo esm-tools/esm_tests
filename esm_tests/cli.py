@@ -5,7 +5,7 @@ A small wrapper that combines the shell interface and the Python interface
 
 # Import from Python Standard Library
 from .esm_tests import *
-import esm_tests.get_shipped_data
+import esm_tests.read_shipped_data
 
 import os
 
@@ -99,8 +99,6 @@ def main():
             info["ignore"] = yaml.load(i, Loader=yaml.FullLoader)
     except FileNotFoundError:
         try:
-            import esm_tests.read_shipped_data
-
             info = esm_tests.read_shipped_data.get_ignore_compare_yaml()
         except FileNotFoundError as e:
             print("Whoops, that did not work... I was looking here:")
