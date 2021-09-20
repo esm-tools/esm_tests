@@ -43,14 +43,22 @@ def user_config(info):
             + "Please answer the following questions. If you ever need to change the "
             + "configuration, you can do that in the the esm_tests/user_config.yaml\n"
         )
-        answers["account"] = input(
-            "What account will you be using for testing? (default: None) "
-        )
+        try:
+            answers["account"] = input(
+                "What account will you be using for testing? (default: None) "
+            )
+        except EOFError:
+            print("This is probably running on the CI System. We will default to None")
+            answers["account"] = None
         if not answers["account"] or answers["account"] == "None":
             answers["account"] = None
-        answers["test_dir"] = input(
-            "In which directory would you like to run the tests? "
-        )
+        try:
+            answers["test_dir"] = input(
+                "In which directory would you like to run the tests? "
+            )
+        except EOFError:
+            print("This is probably running on the CI System. We will default to /dev/null")
+            answers["test_dir"] = "/dev/null"  # NOTE(PG): Miguel needs to check this if it makes sense or not...
         with open(user_config, "w") as uc:
             out = yaml.dump(answers)
             uc.write(out)
