@@ -5,6 +5,7 @@ A small wrapper that combines the shell interface and the Python interface
 
 # Import from Python Standard Library
 from .esm_tests import *
+import esm_tests.get_shipped_data
 
 import os
 
@@ -78,8 +79,11 @@ def main():
 
     # Print state if necessary
     if print_state:
-        with open(f"{info['script_dir']}/state.yaml", "r") as st:
-            current_state = yaml.load(st, Loader=yaml.FullLoader)
+        try:
+            with open(f"{info['script_dir']}/state.yaml", "r") as st:
+                current_state = yaml.load(st, Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            current_state = esm_tests.read_shipped_data.get_state_yaml()
         print_results(current_state)
         sys.exit(1)
 
@@ -93,11 +97,18 @@ def main():
         # Define lines to be ignored during comparison
         with open(f"{info['script_dir']}/ignore_compare.yaml", "r") as i:
             info["ignore"] = yaml.load(i, Loader=yaml.FullLoader)
-    except FileNotFoundError as e:
-        print("Whoops, that did not work... I was looking here:")
-        print(f"{info['script_dir']}/ignore_compare.yaml")
-        for f in os.listdir(info["script_dir"]):
-            print(f)
+    except FileNotFoundError:
+        try:
+            import esm_tests.read_shipped_data
+
+            info = esm_tests.read_shipped_data.get_ignore_compare_yaml()
+        except FileNotFoundError as e:
+            print("Whoops, that did not work... I was looking here:")
+            print(f"{info['script_dir']}/ignore_compare.yaml")
+            for f in os.listdir(info["script_dir"]):
+                print(f)
+            print(e)
+            raise
 
     logger.debug(f"User info: {info['user']}")
     logger.debug(f"Actually compile: {info['actually_compile']}")
