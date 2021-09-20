@@ -10,7 +10,8 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ["esm_parser @ git+https://github.com/esm-tools/esm_parser.git",
+requirements = ["esm_tools @ git+https://github.com/esm-tools/esm_tools.git",
+                "esm_parser @ git+https://github.com/esm-tools/esm_parser.git",
                 "esm_runscripts @ git+https://github.com/esm-tools/esm_runscripts.git",
                 "colorama",
                 "coloredlogs",
