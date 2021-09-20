@@ -34,11 +34,11 @@ compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelist
 def user_config(info):
     # Check for user configuration file
     user_config = f"{info['script_dir']}/user_config.yaml"
-    print()
+    logger.info()
     if not os.path.isfile(user_config):
         # Make the user configuration file
         answers = {}
-        print(
+        logger.info(
             f"{bs}Welcome to ESM-Tests! Automatic testing for ESM-Tools devs\n"
             + f"**********************************************************{be}\n"
             + "Please answer the following questions. If you ever need to change the "
@@ -49,7 +49,9 @@ def user_config(info):
                 "What account will you be using for testing? (default: None) "
             )
         except EOFError:
-            print("This is probably running on the CI System. We will default to None")
+            logger.info(
+                "This is probably running on the CI System. We will default to None"
+            )
             answers["account"] = None
         if not answers["account"] or answers["account"] == "None":
             answers["account"] = None
@@ -58,7 +60,9 @@ def user_config(info):
                 "In which directory would you like to run the tests? "
             )
         except EOFError:
-            print("This is probably running on the CI System. We will default to $HOME")
+            logger.info(
+                f"This is probably running on the CI System. We will default to {os.getcwd()}"
+            )
             answers["test_dir"] = os.getcwd()
         with open(user_config, "w") as uc:
             logger.debug("Writing file")
@@ -69,9 +73,9 @@ def user_config(info):
     # Load the user info
     with open(user_config, "r") as uc:
         user_info = yaml.load(uc, Loader=yaml.FullLoader)
-    print(f"{bs}Running tests with the following configuration:{be}")
-    print(f"{bs}-----------------------------------------------{be}")
-    yprint(user_info)
+    logger.info(f"{bs}Running tests with the following configuration:{be}")
+    logger.info(f"{bs}-----------------------------------------------{be}")
+    yprint.info(user_info)
 
     return user_info
 
@@ -171,7 +175,7 @@ def del_prev_tests(info, scripts_info):
 # FUNCTIONALITIES
 #######################################################################################
 def yprint(pdict):
-    print(yaml.dump(pdict, default_flow_style=False))
+    logger.info(yaml.dump(pdict, default_flow_style=False))
 
 
 def create_env_loader(tag="!ENV", loader=yaml.SafeLoader):
@@ -836,16 +840,16 @@ def save_files(scripts_info, info, user_choice):
 def print_results(results):
     colorama.init(autoreset=True)
 
-    print()
-    print()
-    print(f"{bs}RESULTS{be}")
-    print()
+    logger.info()
+    logger.info()
+    logger.info(f"{bs}RESULTS{be}")
+    logger.info()
     for model, versions in results.items():
-        print(f"{colorama.Fore.CYAN}{model}:")
+        logger.info(f"{colorama.Fore.CYAN}{model}:")
         for version, scripts in versions.items():
-            print(f"    {colorama.Fore.MAGENTA}{version}:")
+            logger.info(f"    {colorama.Fore.MAGENTA}{version}:")
             for script, computers in scripts.items():
-                print(f"        {colorama.Fore.WHITE}{script}:")
+                logger.info(f"        {colorama.Fore.WHITE}{script}:")
                 for computer, data in computers.items():
                     if data["compilation"]:
                         compilation = f"{colorama.Fore.GREEN}compiles"
@@ -855,11 +859,11 @@ def print_results(results):
                         run = f"{colorama.Fore.GREEN}runs"
                     else:
                         run = f"{colorama.Fore.RED}run failed"
-                    print(
+                    logger.info(
                         f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
                     )
-    print()
-    print()
+    logger.info()
+    logger.info()
 
 
 def format_results(info, scripts_info):
