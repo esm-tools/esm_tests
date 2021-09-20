@@ -15,6 +15,8 @@ requirements = ["esm_parser @ git+https://github.com/esm-tools/esm_parser.git",
                 "colorama",
                 "coloredlogs",
                 "questionary",
+                "regex",
+                "loguru",
                ]
 
 setup_requirements = [ ]
