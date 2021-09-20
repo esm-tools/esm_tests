@@ -58,12 +58,10 @@ def user_config(info):
                 "In which directory would you like to run the tests? "
             )
         except EOFError:
-            print(
-                "This is probably running on the CI System. We will default to /dev/null"
-            )
-            answers[
-                "test_dir"
-            ] = "/dev/null"  # NOTE(PG): Miguel needs to check this if it makes sense or not...
+            print("This is probably running on the CI System. We will default to $HOME")
+            answers["test_dir"] = os.environ.get(
+                "HOME"
+            )  # NOTE(PG): Miguel needs to check this if it makes sense or not...
         with open(user_config, "w") as uc:
             out = yaml.dump(answers)
             uc.write(out)
