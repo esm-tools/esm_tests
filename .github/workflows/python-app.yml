@@ -35,11 +35,10 @@ jobs:
         pip install .
     - name: Test if cli is active
       run: |
-        esm_tests
         esm_tests --help
     - name: Test if current state of test results matches
       run: |
-          esm_tests  # TODO(MA): Put here whatever you need to make the match work.
+          esm_tests -c
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

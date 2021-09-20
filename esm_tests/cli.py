@@ -98,7 +98,7 @@ def main():
         print(f"{info['script_dir']}/ignore_compare.yaml")
         for f in os.listdir(info["script_dir"]):
             print(f)
-        
+
     logger.debug(f"User info: {info['user']}")
     logger.debug(f"Actually compile: {info['actually_compile']}")
     logger.debug(f"Actually run: {info['actually_run']}")
