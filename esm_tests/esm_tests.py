@@ -58,8 +58,12 @@ def user_config(info):
                 "In which directory would you like to run the tests? "
             )
         except EOFError:
-            print("This is probably running on the CI System. We will default to /dev/null")
-            answers["test_dir"] = "/dev/null"  # NOTE(PG): Miguel needs to check this if it makes sense or not...
+            print(
+                "This is probably running on the CI System. We will default to /dev/null"
+            )
+            answers[
+                "test_dir"
+            ] = "/dev/null"  # NOTE(PG): Miguel needs to check this if it makes sense or not...
         with open(user_config, "w") as uc:
             out = yaml.dump(answers)
             uc.write(out)
@@ -91,6 +95,9 @@ def get_scripts(info):
         try:
             test_info = read_shipped_data.get_runscripts("test_config.yaml")
             test_info = yaml.safe_load(test_info)
+        except FileNotFoundError:  # NOTE(PG): Not sure if this is the right one to catch...
+            test_info = {}
+    logger.debug(test_info)
     if len(test_info) > 0:
         test_all = False
     else:
@@ -199,7 +206,9 @@ def deep_update(d, u):
 
 
 def copy_comp_files4check_runs(script, script_info, target_dir):
-    files4check_dir = f"{os.path.dirname(script_info['path'])}/comp_files4check_runs/{script}"
+    files4check_dir = (
+        f"{os.path.dirname(script_info['path'])}/comp_files4check_runs/{script}"
+    )
     if os.path.isdir(files4check_dir):
         source_dir = f"{files4check_dir}/{os.listdir(files4check_dir)[0]}"
         combine_folders(source_dir, target_dir)
@@ -407,7 +416,13 @@ def run_test(scripts_info, info):
                             subc += 1
                             v["state"]["run_finished"] = True
                             success = check(
-                                info, "run", model, version, "", script, v,
+                                info,
+                                "run",
+                                model,
+                                version,
+                                "",
+                                script,
+                                v,
                             )
                         elif "ERROR:" in monitoring_out:
                             logger.info(
@@ -418,7 +433,13 @@ def run_test(scripts_info, info):
                             subc += 1
                             v["state"]["run_finished"] = False
                             success = check(
-                                info, "run", model, version, "", script, v,
+                                info,
+                                "run",
+                                model,
+                                version,
+                                "",
+                                script,
+                                v,
                             )
             if not info["keep_run_folders"]:
                 folders_to_remove = [
@@ -622,7 +643,9 @@ def get_rel_paths_compare_files(info, cfile, this_test_dir):
                 break
     elif cfile == "namelists":
         # Get path of the finished_config
-        s_config_yaml, _ = get_rel_paths_compare_files(info, "finished_config", this_test_dir)
+        s_config_yaml, _ = get_rel_paths_compare_files(
+            info, "finished_config", this_test_dir
+        )
         namelists = extract_namelists(f"{user_info['test_dir']}/{s_config_yaml[0]}")
         ldir = os.listdir(f"{user_info['test_dir']}/{this_test_dir}")
         ldir.sort()
@@ -881,4 +904,3 @@ def sort_dict(dict_to_sort):
 #######################################################################################
 # SCRIPT
 #######################################################################################i
-
