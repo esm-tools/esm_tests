@@ -6,6 +6,9 @@ A small wrapper that combines the shell interface and the Python interface
 # Import from Python Standard Library
 from .esm_tests import *
 
+import os
+
+
 def main():
 
     # Parsing
@@ -86,10 +89,16 @@ def main():
     else:
         info["user"] = None
 
-    # Define lines to be ignored during comparison
-    with open(f"{info['script_dir']}/ignore_compare.yaml", "r") as i:
-        info["ignore"] = yaml.load(i, Loader=yaml.FullLoader)
-
+    try:
+        # Define lines to be ignored during comparison
+        with open(f"{info['script_dir']}/ignore_compare.yaml", "r") as i:
+            info["ignore"] = yaml.load(i, Loader=yaml.FullLoader)
+    except FileNotFoundError as e:
+        print("Whoops, that did not work... I was looking here:")
+        print(f"{info['script_dir']}/ignore_compare.yaml")
+        for f in os.listdir(info["script_dir"]):
+            print(f)
+        
     logger.debug(f"User info: {info['user']}")
     logger.debug(f"Actually compile: {info['actually_compile']}")
     logger.debug(f"Actually run: {info['actually_run']}")
