@@ -34,7 +34,7 @@ compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelist
 def user_config(info):
     # Check for user configuration file
     user_config = f"{info['script_dir']}/user_config.yaml"
-    logger.info()
+    logger.info("")
     if not os.path.isfile(user_config):
         # Make the user configuration file
         answers = {}
@@ -840,10 +840,10 @@ def save_files(scripts_info, info, user_choice):
 def print_results(results):
     colorama.init(autoreset=True)
 
-    logger.info()
-    logger.info()
+    logger.info("")
+    logger.info("")
     logger.info(f"{bs}RESULTS{be}")
-    logger.info()
+    logger.info("")
     for model, versions in results.items():
         logger.info(f"{colorama.Fore.CYAN}{model}:")
         for version, scripts in versions.items():
@@ -862,8 +862,8 @@ def print_results(results):
                     logger.info(
                         f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
                     )
-    logger.info()
-    logger.info()
+    logger.info("")
+    logger.info("")
 
 
 def format_results(info, scripts_info):
