@@ -39,9 +39,13 @@ jobs:
     - name: Test if current state of test results matches
       run: |
           esm_tests -c
+    - name: "Store Loguru Log"
+      uses: actions/upload-artifact@v2
+      if: ${{ failure() }}
       with:
         name: "loguru-dump"
         path: "out.log"
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
