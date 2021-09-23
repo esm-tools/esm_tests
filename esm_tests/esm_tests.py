@@ -1,23 +1,18 @@
+from dataclasses import dataclass
+import collections.abc
+import copy
+import difflib
+import glob
 import os
-import sys
-import subprocess
-import argparse
-import math
-import yaml
+import pathlib
 import re
 import shutil
+import subprocess
 import time
-import glob
-import difflib
-import copy
 import colorama
-import regex as re
-import collections.abc
-
-from loguru import logger
-
+import yaml
 from esm_runscripts import color_diff
-from esm_parser import determine_computer_from_hostname
+from loguru import logger
 
 import esm_tests.read_shipped_data
 
@@ -31,6 +26,68 @@ compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelist
 #######################################################################################
 # INITIALIZATION
 #######################################################################################
+
+
+class Comparison:
+    """Compares two ESM Tools files"""
+
+    def __init__(self, test_file, truth_file):
+        """
+        Parameters
+        ----------
+        test_file : str
+            str representation (already opened and read in) of the file (e.g.
+            sad file, compilatoin script, namelist) which you want to check
+        truth_file : str
+            str representation of the file which is known to be a valid truth.
+        """
+        self.test_file = test_file
+        self.truth_file = truth_file
+
+    @classmethod
+    def from_filepaths(cls, test_file, truth_file):
+        with open(test_file, "r") as f1:
+            test_file = f1.read()
+        with open(test_file, "r") as f2:
+            truth_file = f2.read()
+        return cls(test_file, truth_file)
+
+    @classmethod
+    def from_test_filepath_and_pkg(cls, test_file, truth_file):
+        """
+        Given a test filepath, and a relative truth path, return a new Comparison.
+
+        For the relative truth path, we are reading from the package. So,
+        assuming you want to use the following as your truth:
+
+        >>> truth_file = "ollie/run/awicm/awicm2-initial-monthly/scripts/awicm2-initial-monthly_compute_20000101 -20000131.sad"
+
+        This would check the sad file for a run of awicm using a awicm2
+        initialization with monthly restarts which is run on the ollie HPC.
+        """
+        # get last tested (Truth)
+        with open(test_file, "r") as f:
+            test_file = f1.read()
+        truth_file = read_shipped_data.get_last_tested(truth_file)
+        return cls(test_file, truth_file)
+
+
+class CompileFileComparison(Comparison):
+    pass
+
+
+class SadFileComparison(Comparison):
+    pass
+
+
+class FinishedESMConfigComparison(Comparison):
+    pass
+
+
+def NamelistsComparison(Comparison):
+    pass
+
+
 def user_config(info):
     # Check for user configuration file
     user_config = f"{info['script_dir']}/user_config.yaml"
@@ -49,10 +106,13 @@ def user_config(info):
                 "What account will you be using for testing? (default: None) "
             )
         except EOFError:
-            logger.info(
-                "This is probably running on the CI System. We will default to None"
-            )
-            answers["account"] = None
+            if os.environ.get("CI"):
+                logger.info(
+                    "This is probably running on the CI System. We will default to None"
+                )
+                answers["account"] = None
+            else:
+                raise
         if not answers["account"] or answers["account"] == "None":
             answers["account"] = None
         try:
@@ -60,10 +120,13 @@ def user_config(info):
                 "In which directory would you like to run the tests? "
             )
         except EOFError:
-            logger.info(
-                f"This is probably running on the CI System. We will default to {os.getcwd()}"
-            )
-            answers["test_dir"] = os.getcwd()
+            if os.environ.get("CI"):
+                logger.info(
+                    f"This is probably running on the CI System. We will default to {os.getcwd()}"
+                )
+                answers["test_dir"] = os.getcwd()
+            else:
+                raise
         with open(user_config, "w") as uc:
             logger.debug("Writing file")
             out = yaml.dump(answers)
@@ -82,13 +145,13 @@ def user_config(info):
 
 def get_scripts(info):
     for key, value in info.items():
-        logger.debug(f"{key}={value}")
+        logger.debug(f"key {key}: value {value}")
     try:
-        runscripts_dir = f"{info['script_dir']}/runscripts/"
+        runscripts_dir = f"{info.get('script_dir', os.getcwd())}/runscripts/"
         scripts_info = {}
         ns = 0
         # Load test info
-        test_config = f"{info['script_dir']}/test_config.yaml"
+        test_config = f"{info.get('script_dir', os.getcwd())}/test_config.yaml"
         if os.path.isfile(test_config):
             with open(test_config, "r") as t:
                 test_info = yaml.load(t, Loader=yaml.FullLoader)
