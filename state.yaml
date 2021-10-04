@@ -3,30 +3,41 @@ awicm:
     awicm2-initial-monthly:
       ollie:
         compilation: true
-        run: false
+        run: true
   CMIP6:
     awicm1-initial-monthly:
       ollie:
         compilation: true
         run: false
+awiesm:
+  2.1-recom:
+    all_awiesm-2.1-recom:
+      ollie:
+        compilation: true
+        run: true
+  2.1-wiso:
+    PI_ctrl_awiesm-2.1-wiso:
+      ollie:
+        compilation: true
+        run: true
 fesom:
   2.0:
     fesom2.0-initial-monthly:
       ollie:
         compilation: true
-        run: false
+        run: true
   2.1:
     fesom2.1-initial-monthly:
       ollie:
         compilation: true
-        run: false
+        run: true
 fesom-recom:
   1.4:
     fesom-recom1.4-initial-daily:
       ollie:
         compilation: true
-        run: false
+        run: true
     fesom-recom1.4-restart-daily:
       ollie:
         compilation: true
-        run: false
+        run: true

@@ -8,6 +8,7 @@ run:
         actual:
                 errors:
                     - "MISSING FILES"
+                    - "Coupling var not found"
                 files:
                     - "restart/echam/restart*.nc*"
                     - "restart/fesom/fesom.*.oce.restart.nc*"
@@ -16,4 +17,5 @@ run:
                     # no daily output - "outdata/fesom/*.fesom.*.nc"
         check: {}
 computers:
+        - ollie
         - mistral

@@ -157,6 +157,8 @@ fesom:
     - 2
     - 2.0-r
     - 2.0-jio
+    - 2.1-recom
+    - 2.1-wiso
     - 2.1
     bin_dir: /work/ollie/mandresm/testing//comp/fesom-recom/fesom-recom-1.4/bin
     bin_intermediate:
@@ -318,7 +320,7 @@ fesom:
     - uo
     - vo
     - wo
-    daynew: 1
+    daynew: 2
     debug_info:
         loaded_from_file: /home/ollie/mandresm/esm_tools/configs//components/fesom/fesom.yaml
     destination: fesom-1.4
@@ -468,7 +470,7 @@ fesom:
             calendar:
                 include_fleapyear: false
             clockinit:
-                daynew: 1
+                daynew: 2
                 yearnew: 1957
             inout:
                 levelwise_output: true
@@ -1267,7 +1269,7 @@ general:
     ini_restart_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/restart/
     initial_date: '1958-01-03T00:00:00'
     inspect: null
-    jobid: 29736
+    jobid: 41894
     jobtype: prepcompute
     last_run_datestamp: 19580102-19580102
     last_run_in_chunk: false
@@ -1437,6 +1439,7 @@ recom:
     - 2
     - 2.0-r
     - 2.0-recom-awicm
+    bgc_num: 22
     bin_dir: /work/ollie/mandresm/testing//comp/fesom-recom/fesom-recom-1.4/bin
     branch: oxygen
     clean_command: rm -rf build CMakeCache.txt
@@ -1879,6 +1882,7 @@ recom:
         bio_restart: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/restart//recom/fesom.1958.bio.nc
     restart_in_targets:
         bio_restart: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-restart-daily/run_19580103-19580103/work/fesom.1958.bio.nc
+    restart_name: ''
     restart_out_intermediate:
         bio_restart: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-restart-daily/run_19580103-19580103/restart/recom/fesom.1958.bio.nc
     restart_out_sources:

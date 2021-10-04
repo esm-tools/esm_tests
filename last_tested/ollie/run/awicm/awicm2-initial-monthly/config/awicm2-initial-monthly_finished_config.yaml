@@ -171,6 +171,7 @@ echam:
         - 6.3.04p1-recom-awicm
         - 6.3.05p2-concurrent_radiation-paleodyn
         - 6.3.04p1
+        - 6.3.05p2-wiso
         branch: 6.3.04p1
         choose_version:
             6.3.02p4:
@@ -212,9 +213,10 @@ echam:
                 git-repository: https://git.geomar.de/foci/src/echam.git
             6.3.05p2-wiso:
                 branch: wiso
-                clean_command: make clean
-                comp_command: make; make install
-                conf_command: ./configure
+                clean_command: rm -rf src/echam/bin; rm -rf bin; make clean
+                comp_command: ./config/createMakefiles.pl; autoreconf -i --force; mkdir -p src/.deps yaxt/src/.deps yaxt/tests/.deps; ./configure $configure_opts --with-fortran=intel INSTALL='/usr/bin/install -p'; make -j `nproc --all`; make install -j `nproc --all`; mkdir -p src/echam/bin; cp  bin/echam6 src/echam/bin/echam6
+                destination: echam-6.3.05p2-wiso
+                git-repository: https://gitlab.awi.de/pgierz/echam6.git
         clean_command: rm -rf build CMakeCache.txt
         comp_command: mkdir -p build; cd build; cmake ..;   make install -j `nproc --all`
         git-repository: https://gitlab.dkrz.de/modular_esm/echam6.git
@@ -633,6 +635,8 @@ echam:
     lrad_async: false
     lrestart_from_old: false
     lresume: false
+    lwiso: false
+    lwiso_rerun: false
     metadata:
         Authors: Bjorn Stevens (bjorn.stevens@mpimet.mpg.de) among others at MPI-Met
         Description: The ECHAM atmosphere model, major version 6
@@ -680,6 +684,7 @@ echam:
     nprocb: 24
     nprocbr: 0
     npromar: 0
+    nwiso: 0
     ocean_resolution: CORE2
     other_date: '2000-01-31T23:52:30'
     outdata_intermediate:
@@ -1113,6 +1118,19 @@ echam:
     type: atmosphere
     value: echam switch
     version: 6.3.04p1
+    wiso_fields:
+    - o18w_atm
+    - hdow_atm
+    - o16w_atm
+    - o18i_atm
+    - hdoi_atm
+    - o16i_atm
+    - w1_atm
+    - w2_atm
+    - w3_atm
+    - i1_atm
+    - i2_atm
+    - i3_atm
     yr_perp_off: false
 fesom:
     add_namelist_changes:
@@ -1540,7 +1558,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 183653
+    jobid: 165606
     jobtype: prepcompute
     last_run_datestamp: 19991201-19991231
     last_run_in_chunk: false
@@ -2128,7 +2146,7 @@ oasis3mct:
     - 3
     - 4
     - 4.0-oifsdeck
-    branch: 2.8
+    branch: '2.8'
     cf_name_dir: /work/ollie/mandresm/testing//comp/awicm/awicm-2.0/oasis
     clean_command: rm -rf build CMakeCache.txt include lib/libpsmile.a lib/libscrip.a lib/libmct.a lib/libmpeu.a
     comp_command: mkdir -p build; cd build; cmake ..;   make -j 1; mkdir -p ../include/; cp lib/psmile/libpsmile.a lib/psmile/mct/libmct.a lib/psmile/mct/mpeu/libmpeu.a lib/psmile/scrip/libscrip.a ../lib; cp lib/psmile/mod_oasis*mod ../include

@@ -157,6 +157,8 @@ fesom:
     - 2
     - 2.0-r
     - 2.0-jio
+    - 2.1-recom
+    - 2.1-wiso
     - 2.1
     bin_dir: /work/ollie/mandresm/testing//comp/fesom-recom/fesom-recom-1.4/bin
     bin_intermediate:
@@ -1247,7 +1249,7 @@ general:
     - restart_in
     initial_date: '1958-01-01T00:00:00'
     inspect: null
-    jobid: 184327
+    jobid: 164869
     jobtype: prepcompute
     last_run_datestamp: 19571231-19571231
     last_run_in_chunk: false
@@ -1417,6 +1419,7 @@ recom:
     - 2
     - 2.0-r
     - 2.0-recom-awicm
+    bgc_num: 22
     bin_dir: /work/ollie/mandresm/testing//comp/fesom-recom/fesom-recom-1.4/bin
     branch: oxygen
     clean_command: rm -rf build CMakeCache.txt
@@ -1849,6 +1852,7 @@ recom:
     parent_expid: fesom-recom1.4-initial-daily
     parent_restart_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/restart/recom/
     prev_date: '1957-12-31T23:45:00'
+    restart_name: ''
     restart_out_intermediate:
         bio_restart: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/restart/recom/fesom.1958.bio.nc
     restart_out_sources:
