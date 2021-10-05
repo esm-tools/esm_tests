@@ -9,6 +9,12 @@ awicm:
       ollie:
         compilation: true
         run: false
+awicm3:
+  frontiers:
+    awicm3-frontiers-ollie-TCO159L91-CORE2_inital:
+      ollie:
+        compilation: true
+        run: true
 awiesm:
   2.1-recom:
     all_awiesm-2.1-recom:
