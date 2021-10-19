@@ -29,6 +29,12 @@ awiesm:
       ollie:
         compilation: true
         run: true
+echam:
+  6.3.04p1:
+    echam6.3.04p1-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
 fesom:
   2.0:
     fesom2.0-initial-monthly:
