@@ -17,10 +17,8 @@ computer:
             frequency: 30
             message: 'SLURM ERROR: slurm endet with an error, exiting.'
             method: kill
-    cname: compute
     config_files:
         hostfile: hostfile_srun
-    cpn: 24
     cpu_bind: cores
     cxx: mpiicpc
     debug_info:
@@ -107,7 +105,9 @@ computer:
     overcommit_nodes: None
     overcommit_rule: ''
     partition: compute
+    partition_cpn: 24
     partition_flag: --partition=@partition@
+    partition_name: compute
     partitions:
         compute:
             cores_per_node: 24
@@ -1304,7 +1304,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 18330
+    jobid: 7375
     jobtype: prepcompute
     last_run_datestamp: 19991201-19991231
     last_run_in_chunk: false
