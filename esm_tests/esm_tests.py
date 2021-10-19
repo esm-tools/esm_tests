@@ -213,6 +213,8 @@ def comp_test(scripts_info, info):
         if model == "general":
             continue
         for script, v in scripts.items():
+            if info["hold"] and c!=0:
+                input("Press ENTER to continue...")
             c += 1
             progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
@@ -309,6 +311,8 @@ def run_test(scripts_info, info):
         if model == "general":
             continue
         for script, v in scripts.items():
+            if info["hold"] and c!=0:
+                input("Press ENTER to continue...")
             c += 1
             progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
@@ -377,12 +381,12 @@ def run_test(scripts_info, info):
             exp_dir = f"{user_info['test_dir']}/run/{model}/{script}/"
             exp_dir_log = f"{exp_dir}/log/"
             for f in os.listdir(exp_dir_log):
-                if "_tidy_" in f and ".log" in f:
+                if "_observe_" in f and ".log" in f:
                     with open(f"{exp_dir_log}/{f}") as m:
-                        monitoring_out = m.read()
+                        observe_out = m.read()
                         if (
                             "Reached the end of the simulation, quitting"
-                            in monitoring_out
+                            in observe_out
                         ):
                             logger.info(
                                 f"\tRUN FINISHED ({progress}%) {model}/{script}"
@@ -394,7 +398,7 @@ def run_test(scripts_info, info):
                             success = check(
                                 info, "run", model, version, "", script, v,
                             )
-                        elif "ERROR:" in monitoring_out:
+                        elif "ERROR:" in observe_out:
                             logger.info(
                                 f"\tRUN FINISHED ({progress}%) {model}/{script}"
                             )

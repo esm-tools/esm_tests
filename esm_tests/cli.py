@@ -52,6 +52,13 @@ def main():
         help="Print the state stored in state.yaml",
         action="store_true",
     )
+    parser.add_argument(
+        "-o",
+        "--hold",
+        default=False,
+        help="Hold before operation, to give time to check the output",
+        action="store_true",
+    )
 
     info = {}
 
@@ -63,6 +70,7 @@ def main():
     info["keep_run_folders"] = args["keep"]
     save_flag = args["save"]
     print_state = args["state"]
+    info["hold"] = args["hold"]
 
     info["script_dir"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
     info["last_tested_dir"] = f"{info['script_dir']}/last_tested/"
