@@ -2,11 +2,12 @@
 #SBATCH --partition=compute
 #SBATCH --time=00:08:00
 #SBATCH --ntasks=288
-#SBATCH --output=/work/ab0246/a270152/testing//run/fesom//fesom2.1-initial-monthly//scripts/fesom2.1-initial-monthly_compute_20010101-20010131_%j.log --error=/work/ab0246/a270152/testing//run/fesom//fesom2.1-initial-monthly//scripts/fesom2.1-initial-monthly_compute_20010101-20010131_%j.log
+#SBATCH --output=/work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/log/fesom2.1-initial-monthly_fesom_compute_20010101-20010131.log --error=/work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/log/fesom2.1-initial-monthly_fesom_compute_20010101-20010131.log
 #SBATCH --job-name=fesom2.1-initial-monthly
-#SBATCH --account=ab0246
+#SBATCH --account=ab0995
 #SBATCH --mail-type=NONE
 #SBATCH --ntasks-per-core=1
+#SBATCH --mem=0
 #SBATCH --exclusive
 
 module purge
@@ -60,20 +61,30 @@ export OMPI_MCA_coll=^ghc
 export OMPI_MCA_mtl_mxm_np=0
 export MXM_RDMA_PORTS=mlx5_0:1
 export MXM_LOG_LEVEL=FATAL
-export ACCOUNT=ab0246
-export ESM_TESTING_DIR=/work/ab0246/a270152/testing//run/fesom/
-export MODEL_DIR=/work/ab0246/a270152/testing//comp/fesom/fesom-2.1
+export ACCOUNT=ab0995
+export ESM_TESTING_DIR=/work/ab0995/a270152/testing//run/fesom/
+export MODEL_DIR=/work/ab0995/a270152/testing//comp/fesom/fesom-2.1
 export takenfrom=fesom2_run
 export taken2from=fesom2_ru
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
+
 
 # Set stack size to unlimited
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-cd /work/ab0246/a270152/testing//run/fesom//fesom2.1-initial-monthly//run_20010101-20010131/work/
-echo $(date +%c) : compute 1 2001-01-01T00:00:00 20616 - start >> /work/ab0246/a270152/testing//run/fesom//fesom2.1-initial-monthly//log//fesom2.1-initial-monthly_fesom.log
-time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun &
+echo $(date +"%a %b  %e %T %Y") : compute 1 2001-01-01T00:00:00 30485 - start >> /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/log//fesom2.1-initial-monthly_fesom.log
+
+cd /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/run_20010101-20010131/work/
+time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun 2>&1 &
+
+# Call to esm_runscript to start subjobs:
+# ['tidy']
 process=$! 
-cd /work/ab0246/a270152/testing//run/fesom//fesom2.1-initial-monthly//scripts/
-esm_runscripts fesom2.1-initial-monthly.yaml -e fesom2.1-initial-monthly -t tidy_and_resubmit -p ${process} -j compute -v --no-motd  --open-run
+# Comment the following line if you don't want esm_runscripts to restart:
+cd /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/scripts/
+esm_runscripts fesom2.1-initial-monthly.yaml -e fesom2.1-initial-monthly -t observe_compute -p ${process} -s 20010101 -r 1 -v  --open-run
+
+echo $(date +"%a %b  %e %T %Y") : compute 1 2001-01-01T00:00:00 30485 - done >> /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/log//fesom2.1-initial-monthly_fesom.log
+
+wait

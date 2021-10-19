@@ -1,6 +1,9 @@
 awicm:
   '2.0':
     awicm2-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
@@ -29,11 +32,17 @@ awiesm:
 fesom:
   2.0:
     fesom2.0-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
   2.1:
     fesom2.1-initial-monthly:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true

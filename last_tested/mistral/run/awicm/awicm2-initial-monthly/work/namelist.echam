@@ -4,7 +4,7 @@
     putrerun = 1, 'months', 'first', 0
     lfractional_mask = .false.
     lresume = .false.
-    out_datapath = '/work/ab0246/a270152/testing//run/awicm//awicm2-initial-monthly//run_20000101-20000131/work/'
+    out_datapath = '/work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/run_20000101-20000131/work/'
     out_expname = 'awicm2-initial-monthly'
     rerun_filetype = 4
     delta_time = 450
