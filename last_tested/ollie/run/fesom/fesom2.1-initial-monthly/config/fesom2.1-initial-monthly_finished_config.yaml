@@ -742,7 +742,7 @@ general:
     - restart_in
     initial_date: '2001-01-01T00:00:00'
     inspect: null
-    jobid: 119867
+    jobid: 119681
     jobtype: prepcompute
     last_run_datestamp: 20001201-20001231
     last_run_in_chunk: false
@@ -837,7 +837,7 @@ general:
                 called_from: prepcompute
                 next_submit:
                 - tidy
-                nproc: 0
+                nproc: 288
                 order_in_cluster: sequential
                 run_before: tidy
                 run_on_queue: mpp
@@ -868,7 +868,7 @@ general:
                 submit_to_batch_system: false
         subjobs:
             compute_general:
-                nproc: 0
+                nproc: 288
                 run_before: tidy
                 run_on_queue: mpp
                 subjob_cluster: compute
