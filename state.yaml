@@ -35,6 +35,9 @@ echam:
       mistral:
         compilation: true
         run: true
+      ollie:
+        compilation: true
+        run: false
 fesom:
   2.0:
     fesom2.0-initial-monthly:
@@ -61,4 +64,4 @@ fesom-recom:
     fesom-recom1.4-restart-daily:
       ollie:
         compilation: true
-        run: false
+        run: true

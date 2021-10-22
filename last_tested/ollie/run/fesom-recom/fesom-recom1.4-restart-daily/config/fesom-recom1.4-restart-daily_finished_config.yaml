@@ -1180,30 +1180,81 @@ general:
     experiment_unknown_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-restart-daily/unknown/
     expid: fesom-recom1.4-restart-daily
     file_movements:
-        analysis: {}
+        analysis:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
         bin:
             exp_to_run: copy
             init_to_exp: copy
             run_to_work: copy
             work_to_run: copy
-        config: {}
-        couple: {}
-        default:
+        config:
             exp_to_run: copy
             init_to_exp: copy
             run_to_work: copy
             work_to_run: copy
-        forcing: {}
-        ignore: {}
-        input: {}
-        log: {}
-        mon: {}
-        outdata: {}
-        restart_in: {}
-        restart_out: {}
-        scripts: {}
-        unknown: {}
-        viz: {}
+        couple:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        forcing:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        ignore:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        input:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        log:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        mon:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        outdata:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_in:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_out:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        scripts:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        unknown:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        viz:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
     final_date: '1958-01-05T00:00:00'
     first_initial_year: 1958
     first_run_in_chunk: true
@@ -1218,7 +1269,7 @@ general:
     ini_restart_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/restart/
     initial_date: '1958-01-03T00:00:00'
     inspect: null
-    jobid: 33270
+    jobid: 43998
     jobtype: prepcompute
     last_run_datestamp: 19580102-19580102
     last_run_in_chunk: false
