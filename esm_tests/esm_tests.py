@@ -119,7 +119,11 @@ def read_info_from_rs(scripts_info):
         for script, v in scripts.items():
             with open(v["path"], "r") as rs:
                 runscript = yaml.load(rs, Loader=yaml.SafeLoader)
-            v["version"] = runscript[model]["version"]
+            v["version"] = runscript["general"].get(
+                "comp_version",
+                runscript[model]["version"]
+            )
+            v["comp_command"] = runscript["general"].get("comp_command", None)
 
     return scripts_info
 
@@ -218,7 +222,10 @@ def comp_test(scripts_info, info):
             c += 1
             progress = round(c / scripts_info["general"]["num_scripts"] * 100, 1)
             version = v["version"]
-            comp_command = f"esm_master comp-{model}-{version} --no-motd -k"
+            if v["comp_command"]:
+                comp_command = f"{v['comp_command']} --no-motd -k"
+            else:
+                comp_command = f"esm_master comp-{model}-{version} --no-motd -k"
             general_model_dir = f"{user_info['test_dir']}/comp/{model}"
             model_dir = f"{user_info['test_dir']}/comp/{model}/{model}-{version}"
             logger.info(f"\tCOMPILING ({progress}%) {model}-{version}:")
@@ -234,11 +241,28 @@ def comp_test(scripts_info, info):
             else:
                 # Gets the source code if actual compilation is required
                 if info["actually_compile"]:
-                    get_command = f"esm_master get-{model}-{version} --no-motd"
-                    logger.info("\t\tDownloading")
-                    out = sh(get_command)
-                    if "Traceback (most recent call last):" in out:
-                        logger.error(f"\t\t\tProblem downloading!\n\n{out}")
+                    # Downloading or copying
+                    with open(f"{os.path.dirname(v['path'])}/config.yaml", "r") as cf:
+                        config_test = yaml.load(cf, Loader=yaml.FullLoader)
+                    copying = config_test["comp"].get("cp_instead_of_download", {}).get(f"{model}-{version}")
+                    if copying:
+                        logger.info("\t\tCopying")
+                        out = ""
+                        if os.path.isdir(copying):
+                            shutil.copytree(copying, general_model_dir)
+                        else:
+                            shutil.copy2(copying, general_model_dir)
+                        if copying.endswith("tar.gz"):
+                            logger.info("\t\tUntaring")
+                            file2untar = f"{general_model_dir}/{os.path.basename(copying)}"
+                            out += sh(f"tar -xvf {file2untar}")
+                            os.remove(file2untar)
+                    else:
+                        get_command = f"esm_master get-{model}-{version} --no-motd"
+                        logger.info("\t\tDownloading")
+                        out = sh(get_command)
+                        if "Traceback (most recent call last):" in out:
+                            logger.error(f"\t\t\tProblem downloading!\n\n{out}")
                 # For no compilation trick esm_master into thinking that the source code has been downloaded
                 else:
                     # Evaluate and create folders to trick esm_master
@@ -652,7 +676,10 @@ def extract_namelists(s_config_yaml):
 
     namelists = []
     for component in config.keys():
-        namelists.extend(config[component].get("namelists", []))
+        namelists_component = config[component].get("namelists", [])
+        for nml in namelists_component:
+            if nml in config[component].get("config_sources", {}):
+                namelists.append(nml)
 
     return namelists
 

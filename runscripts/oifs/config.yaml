@@ -1,0 +1,20 @@
+comp:
+        actual:
+                files:
+                    - "bin/oifs"
+                    - "bin/xios.x"
+        check: {}
+        cp_instead_of_download:
+                oifs-43r3-v1: "/scratch/usr/hbkmandr/oifs-43r3-v1.tar.gz"
+run:
+        actual:
+                errors:
+                    - "MISSING FILES"
+                files:
+                    - "restart/oifs/*/rcf"
+                    - "restart/oifs/*/srf*"
+                    - "outdata/oifs/*/ECE*.nc"
+        check: {}
+computer:
+        - blogin
+        - glogin
