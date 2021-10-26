@@ -14,8 +14,13 @@ awicm:
         run: false
 awicm3:
   frontiers:
-    awicm3-frontiers-ollie-TCO159L91-CORE2_inital:
-      ollie:
+    awicm3-frontiers-TCO159L91-CORE2_inital:
+      juwels:
+        compilation: true
+        run: true
+  v3.0:
+    awicm3-v3.0-TCO159L91-CORE2_inital:
+      juwels:
         compilation: true
         run: true
 awiesm:
