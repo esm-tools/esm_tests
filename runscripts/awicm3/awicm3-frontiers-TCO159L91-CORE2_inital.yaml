@@ -27,9 +27,10 @@ fesom:
         juwels:
             pool_dir: "/p/project/chhb19/jstreffi/input/fesom2/"
             mesh_dir: "${pool_dir}/core2/"
-            nproc: 192
+            rnproc: 192
         ollie:
-            nproc: 144
+            rnproc: 144
+    nproc: ${rnproc}
     restart_rate: 1
     restart_unit: "d"
     restart_first: 1
@@ -51,9 +52,11 @@ oifs:
     wam: true
     choose_computer.name:
         ollie:
-            nproc: 72
+            rnproc: 72
+            shit: 1
         juwels:
-            nproc: 96
+            rnproc: 96
+    nproc: ${rnproc}
     omp_num_threads: 2
 
 oasis3mct:

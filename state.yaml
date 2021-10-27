@@ -18,9 +18,15 @@ awicm3:
       juwels:
         compilation: true
         run: true
+      ollie:
+        compilation: true
+        run: true
   v3.0:
     awicm3-v3.0-TCO159L91-CORE2_inital:
       juwels:
+        compilation: true
+        run: true
+      ollie:
         compilation: true
         run: true
 awiesm:

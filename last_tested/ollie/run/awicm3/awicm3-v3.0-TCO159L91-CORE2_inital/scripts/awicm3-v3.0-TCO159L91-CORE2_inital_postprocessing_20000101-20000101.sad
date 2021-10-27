@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 #SBATCH --partition=smp
-#SBATCH --time=00:30:00
+#SBATCH --time=00:20:00
 #SBATCH --nodes=1
-#SBATCH --output=/work/ollie/mandresm/testing//run/awicm3//awicm3-frontiers-ollie-TCO159L91-CORE2_inital/log/awicm3-frontiers-ollie-TCO159L91-CORE2_inital_awicm3_postprocessing_20000101-20000101.log --error=/work/ollie/mandresm/testing//run/awicm3//awicm3-frontiers-ollie-TCO159L91-CORE2_inital/log/awicm3-frontiers-ollie-TCO159L91-CORE2_inital_awicm3_postprocessing_20000101-20000101.log
-#SBATCH --job-name=awicm3-frontiers-ollie-TCO159L91-CORE2_inital
+#SBATCH --output=/work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/log/awicm3-v3.0-TCO159L91-CORE2_inital_awicm3_postprocessing_20000101-20000101.log --error=/work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/log/awicm3-v3.0-TCO159L91-CORE2_inital_awicm3_postprocessing_20000101-20000101.log
+#SBATCH --job-name=awicm3-v3.0-TCO159L91-CORE2_inital
 #SBATCH --mail-type=NONE
 #SBATCH --exclusive
 
@@ -56,7 +56,7 @@ export OMP_SCHEDULE=STATIC
 export OMP_STACKSIZE=128M
 export ACCOUNT=None
 export ESM_TESTING_DIR=/work/ollie/mandresm/testing//run/awicm3/
-export MODEL_DIR=/work/ollie/mandresm/testing//comp/awicm3/awicm3-frontiers
+export MODEL_DIR=/work/ollie/mandresm/testing//comp/awicm3/awicm3-v3.0
 export FESOM_USE_CPLNG="active"
 export ECE_CPL_NEMO_LIM="false"
 export ECE_CPL_FESOM_FESIM="true"
@@ -74,9 +74,9 @@ unset SLURM_ARBITRARY_NODELIST
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-echo $(date +"%a %b  %e %T %Y") : postprocessing_oifs 1 2000-01-01T00:00:00 12456649 - start >> /work/ollie/mandresm/testing//run/awicm3//awicm3-frontiers-ollie-TCO159L91-CORE2_inital/log//awicm3-frontiers-ollie-TCO159L91-CORE2_inital_awicm3.log
+echo $(date +"%a %b  %e %T %Y") : postprocessing_oifs 1 2000-01-01T00:00:00 12476736 - start >> /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/log//awicm3-v3.0-TCO159L91-CORE2_inital_awicm3.log
 
-cd /work/ollie/mandresm/testing//run/awicm3//awicm3-frontiers-ollie-TCO159L91-CORE2_inital/run_20000101-20000101/work/
-time srun -l --kill-on-bad-exit=1 --cpu_bind=none /home/ollie/mandresm/esm_tools/configs//setups/awicm3/postprocessing.sh 2>&1 &
+cd /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/run_20000101-20000101/work/
+time srun -l --kill-on-bad-exit=1 --cpu_bind=none /home/ollie/mandresm/esm_tools/configs//setups/awicm3/postprocessing.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/outdata/oifs/ 20000101 2>&1 &
 
 wait
