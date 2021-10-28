@@ -4,9 +4,22 @@ A small wrapper that combines the shell interface and the Python interface
 """
 
 # Import from Python Standard Library
+import argparse
+from loguru import logger
+
 from .esm_tests import *
+import esm_tests.read_shipped_data
+
+import os
+import sys
+
 
 def main():
+    # Logger
+    logger.remove()
+    logger.add(sys.stderr, format="{message}")
+    if os.environ.get("CI", False):
+        logger.add("out.log", backtrace=True, diagnose=True)
 
     # Parsing
     parser = argparse.ArgumentParser(description="Automatic testing for ESM-Tools devs")
@@ -83,8 +96,11 @@ def main():
 
     # Print state if necessary
     if print_state:
-        with open(f"{info['script_dir']}/state.yaml", "r") as st:
-            current_state = yaml.load(st, Loader=yaml.FullLoader)
+        try:
+            with open(f"{info['script_dir']}/state.yaml", "r") as st:
+                current_state = yaml.load(st, Loader=yaml.FullLoader)
+        except FileNotFoundError:
+            current_state = esm_tests.read_shipped_data.get_state_yaml()
         print_results(current_state)
         sys.exit(1)
 
@@ -95,12 +111,19 @@ def main():
         info["user"] = None
 
     # Define lines to be ignored during comparison
-    with open(f"{info['script_dir']}/ignore_compare.yaml", "r") as i:
-        info["ignore"] = yaml.load(i, Loader=yaml.FullLoader)
+    try:
+        info["ignore"] = esm_tests.read_shipped_data.get_ignore_compare_yaml()
+    except FileNotFoundError as e:
+        print("Whoops, that did not work... I was looking here:")
+        print(f"{info['script_dir']}/ignore_compare.yaml")
+        for f in os.listdir(info["script_dir"]):
+            print(f)
+        print(e)
+        raise
 
-    logger.debug(f"User info: {info['user']}")
-    logger.debug(f"Actually compile: {info['actually_compile']}")
-    logger.debug(f"Actually run: {info['actually_run']}")
+    logger.debug(f"User info: {info.get('user')}")
+    logger.debug(f"Actually compile: {info.get('actually_compile')}")
+    logger.debug(f"Actually run: {info.get('actually_run')}")
 
     # Gather scripts
     scripts_info = get_scripts(info)
