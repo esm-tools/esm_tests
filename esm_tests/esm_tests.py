@@ -211,6 +211,7 @@ def combine_folders(source_dir, target_dir):
 def comp_test(scripts_info, info):
     cd_format = re.compile("         cd (.*)")
     user_info = info["user"]
+    this_computer = info["this_computer"]
 
     c = 0
     for model, scripts in scripts_info.items():
@@ -244,7 +245,7 @@ def comp_test(scripts_info, info):
                     # Downloading or copying
                     with open(f"{os.path.dirname(v['path'])}/config.yaml", "r") as cf:
                         config_test = yaml.load(cf, Loader=yaml.FullLoader)
-                    copying = config_test["comp"].get("cp_instead_of_download", {}).get(f"{model}-{version}")
+                    copying = config_test["comp"].get("cp_instead_of_download", {}).get(this_computer, {}).get(f"{model}-{version}")
                     if copying:
                         logger.info("\t\tCopying")
                         out = ""
