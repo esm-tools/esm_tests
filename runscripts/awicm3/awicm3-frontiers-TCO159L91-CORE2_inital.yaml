@@ -52,10 +52,9 @@ oifs:
     wam: true
     choose_computer.name:
         ollie:
-            rnproc: 72
-            shit: 1
+            rnproc: 18
         juwels:
-            rnproc: 96
+            rnproc: 24
     nproc: ${rnproc}
     omp_num_threads: 2
 
