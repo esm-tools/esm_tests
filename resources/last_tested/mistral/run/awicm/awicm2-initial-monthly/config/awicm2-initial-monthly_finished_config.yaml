@@ -23,7 +23,7 @@ computer:
     cxx: mpiicpc
     debug_info:
         loaded_from_file:
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//machines/mistral.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//machines/mistral.yaml
     debugger: None
     debugger_flags_prelauncher: ''
     exclusive_flag: --exclusive
@@ -137,12 +137,12 @@ computer:
     use_hyperthreading: false
 debug_info:
     loaded_from_file:
-    - /mnt/lustre01/pf/a/a270152/esm_tools/configs//setups/awicm/awicm-2.0.yaml
+    - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//setups/awicm/awicm-2.0.yaml
 defaults:
     clean_command: rm -rf build CMakeCache.txt
     comp_command: mkdir -p build; cd build; cmake ..;   make install -j `nproc --all`
     debug_info:
-        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs//defaults/download_and_compile.yaml
+        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//defaults/download_and_compile.yaml
 echam:
     _nx: 192
     _ny: 96
@@ -239,7 +239,7 @@ echam:
     config_intermediate:
         namelist.echam: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/config/echam/namelist.echam
     config_sources:
-        namelist.echam: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//echam/6.3.04p1/PI-CTRL/namelist.echam
+        namelist.echam: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//echam/6.3.04p1/PI-CTRL/namelist.echam
     config_targets:
         namelist.echam: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/work/namelist.echam
     coupling_fields:
@@ -316,8 +316,8 @@ echam:
     dataset: r0007
     debug_info:
         loaded_from_file:
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/echam/echam.yaml
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/echam/echam.postprocessing.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/echam/echam.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/echam/echam.postprocessing.yaml
     disturbance: 1.000001
     executable: echam6
     experiment_analysis_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/analysis/echam/
@@ -691,7 +691,7 @@ echam:
                 - months
                 - first
                 - 0
-    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//echam/6.3.04p1/PI-CTRL
+    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//echam/6.3.04p1/PI-CTRL
     namelists:
     - namelist.echam
     nproca: 24
@@ -1196,12 +1196,12 @@ fesom:
         io: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/config/fesom/namelist.io
         oce: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/config/fesom/namelist.oce
     config_sources:
-        config: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0//namelist.config
+        config: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0//namelist.config
         fesom.clock: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/run_20000101-20000131/config/fesom//fesom.clock
-        forcing: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0//namelist.forcing
-        ice: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0//namelist.ice
-        io: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0//namelist.io
-        oce: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0//namelist.oce
+        forcing: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0//namelist.forcing
+        ice: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0//namelist.ice
+        io: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0//namelist.io
+        oce: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0//namelist.oce
     config_targets:
         config: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/work/namelist.config
         fesom.clock: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/work/fesom.clock
@@ -1249,7 +1249,7 @@ fesom:
     currentday: 1
     daynew: 1
     debug_info:
-        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/fesom/fesom-2.0.yaml
+        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/fesom/fesom-2.0.yaml
     executable: fesom
     experiment_analysis_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/analysis/fesom/
     experiment_bin_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/bin/fesom/
@@ -1408,7 +1408,7 @@ fesom:
                 nm_xwind_file: /pool/data/AWICM//FESOM2/FORCING//u_10.
                 nm_ywind_file: /pool/data/AWICM//FESOM2/FORCING//v_10.
         namelist.oce: *id001
-    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0/
+    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//fesom2/2.0/
     namelists:
     - namelist.config
     - namelist.forcing
@@ -1536,10 +1536,10 @@ general:
     - fesom-2.0+echam-6.3.04p1
     current_date: '2000-01-01T00:00:00'
     debug_info:
-        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs//defaults/general.yaml
+        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//defaults/general.yaml
     defaults.yaml:
         debug_info:
-            loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs//esm_software/esm_runscripts/defaults.yaml
+            loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//esm_software/esm_runscripts/defaults.yaml
         per_model_defaults: {}
     delta_date:
     - 0
@@ -1651,7 +1651,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 21789
+    jobid: 7901
     jobtype: prepcompute
     last_run_datestamp: 19991201-19991231
     last_run_in_chunk: false
@@ -1764,7 +1764,7 @@ general:
                 called_from: prepcompute
                 next_submit:
                 - tidy
-                nproc: 576
+                nproc: 864
                 order_in_cluster: sequential
                 run_before: tidy
                 run_on_queue: compute
@@ -1795,7 +1795,7 @@ general:
                 submit_to_batch_system: false
         subjobs:
             compute_general:
-                nproc: 576
+                nproc: 864
                 run_before: tidy
                 run_on_queue: compute
                 subjob_cluster: compute
@@ -1825,7 +1825,7 @@ hdmodel:
     - ignore
     debug_info:
         loaded_from_file:
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/hdmodel/hdmodel.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/hdmodel/hdmodel.yaml
     description: 'The Hagemann/Duemenil hydrology model,
 
         (someone from Hamburg)
@@ -1992,15 +1992,15 @@ jsbach:
     config_intermediate:
         namelist.jsbach: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/config/jsbach/namelist.jsbach
     config_sources:
-        namelist.jsbach: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//jsbach/3.20/PI-CTRL/no_dynveg/namelist.jsbach
+        namelist.jsbach: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//jsbach/3.20/PI-CTRL/no_dynveg/namelist.jsbach
     config_targets:
         namelist.jsbach: /work/ab0995/a270152/testing/run/awicm/awicm2-initial-monthly/run_20000101-20000131/work/namelist.jsbach
     cover_fract_dir: /pool/data/JSBACH/input/r0010/T63/land_use_maps/
     dataset: r0010
     debug_info:
         loaded_from_file:
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/jsbach/jsbach.yaml
-        - /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/jsbach/jsbach.datasets.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/jsbach/jsbach.yaml
+        - /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/jsbach/jsbach.datasets.yaml
     description: 'The JSBACH vegetation model, major version 3
 
         (someone from Hamburg)
@@ -2235,7 +2235,7 @@ jsbach:
             hydrology_ctl:
                 gethd: remove_from_namelist
                 puthd: remove_from_namelist
-    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//jsbach/3.20/PI-CTRL/no_dynveg
+    namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists/.//jsbach/3.20/PI-CTRL/no_dynveg
     namelists:
     - namelist.jsbach
     no_dynveg_file_ending: ''
@@ -2439,7 +2439,7 @@ oasis3mct:
         - snt_atmo <--distwgt-- snt_feom
     coupling_time_step: 3600
     debug_info:
-        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs//components/oasis3mct/oasis3mct.yaml
+        loaded_from_file: /mnt/lustre01/pf/a/a270152/esm_tools/configs/.//components/oasis3mct/oasis3mct.yaml
     destination: oasis
     experiment_analysis_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/analysis/oasis3mct/
     experiment_bin_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/bin/oasis3mct/
