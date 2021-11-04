@@ -5,7 +5,10 @@ comp:
                     - "bin/xios.x"
         check: {}
         cp_instead_of_download:
-                oifs-43r3-v1: "/scratch/usr/hbkmandr/oifs-43r3-v1.tar.gz"
+                blogin:
+                        oifs-43r3-v1: "/scratch/usr/hbkmandr/oifs-43r3-v1.tar.gz"
+                juwels:
+                        oifs-43r3-v1: "/p/scratch/chhb19/mandresm/oifs-43r3-v1.tar.gz"
 run:
         actual:
                 errors:

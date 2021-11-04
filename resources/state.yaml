@@ -94,15 +94,24 @@ foci:
       blogin:
         compilation: true
         run: true
+      juwels:
+        compilation: true
+        run: true
 focioifs:
   '2.0':
     focioifs-piCtl-test_lowcpu:
       blogin:
         compilation: true
         run: true
+      juwels:
+        compilation: true
+        run: true
 oifs:
   43r3-v1:
     oifs-43r3-tco95-amip-test_lowcpu:
       blogin:
+        compilation: true
+        run: true
+      juwels:
         compilation: true
         run: true
