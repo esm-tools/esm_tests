@@ -55,14 +55,15 @@ export MXM_RDMA_PORTS=mlx5_0:1
 export MXM_LOG_LEVEL=FATAL
 export MKLROOT=/sw/rhel6-x64/intel/intel-18.0.4/compilers_and_libraries_2018/linux/mkl/lib/intel64/
 export LAPACK_LIB_DEFAULT="-L$MKLROOT -lmkl_intel_lp64 -lmkl_core -lmkl_sequential"
-export ESM_NETCDF_C_DIR=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-parallel-impi-intel14/
-export ESM_NETCDF_F_DIR=/sw/rhel6-x64/netcdf/netcdf_fortran-4.4.3-parallel-impi-intel14/
-export GRIBAPIROOT=/sw/rhel6-x64/grib_api/grib_api-1.15.0-intel14/
+export ESM_NETCDF_C_DIR=$NETCDFROOT
+export ESM_NETCDF_F_DIR=$NETCDFFROOT
+export GRIBAPIROOT=/sw/rhel6-x64/grib_api/grib_api-1.15.0-intel14
+export GRIBROOT=/sw/rhel6-x64/grib_api/grib_api-1.15.0-intel14
 export UDUNITS2_ROOT=/sw/rhel6-x64/util/udunits-2.2.26-gcc64
 export FFTW_ROOT=/sw/rhel6-x64/numerics/fftw-3.3.7-openmp-gcc64
 export PROJ4_ROOT=/sw/rhel6-x64/graphics/proj4-4.9.3-gcc48
 export PATH=/sw/rhel6-x64/gcc/binutils-2.24-gccsys/bin:${PATH}
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GRIBAPIROOT/lib:$PROJ4_ROOT/lib:$FFTW_ROOT/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GRIBAPIROOT/lib:$PROJ4_ROOT/lib:$FFTW_ROOT/lib:$SZIPROOT/lib
 export GRIB_SAMPLES_PATH="$GRIBAPIROOT/share/grib_api/ifs_samples/grib1_mlgrib2/"
 export PATH=$PATH:/mnt/lustre01/sw/rhel6-x64/devtools/fcm-2017.10.0/bin/
 export OIFS_GRIB_API_INCLUDE="-I$GRIBAPIROOT/include"
@@ -88,6 +89,7 @@ export OIFS_CCDEFS="LINUX LITTLE INTEGER_IS_INT _ABI64 BLAS"
 export OIFS_FFTW_DIR="$FFTW_ROOT"
 export OIFS_FFTW_INCLUDE="-I$OIFS_FFTW_DIR/include/"
 export OIFS_FFTW_LIB="-L$OIFS_FFTW_DIR/lib/ -lfftw3f"
+export DR_HOOK_IGNORE_SIGNALS=-1
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
 

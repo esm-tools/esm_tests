@@ -490,7 +490,7 @@ def run_test(scripts_info, info):
             exp_dir = f"{user_info['test_dir']}/run/{model}/{script}/"
             exp_dir_log = f"{exp_dir}/log/"
             for f in os.listdir(exp_dir_log):
-                if "_observe_" in f and ".log" in f:
+                if "_compute_" in f and ".log" in f:
                     with open(f"{exp_dir_log}/{f}") as m:
                         observe_out = m.read()
                         if (
@@ -833,7 +833,7 @@ def save_files(scripts_info, info, user_choice):
     actually_run = info["actually_run"]
     user_info = info["user"]
     last_tested_dir = info["last_tested_dir"]
-    runscripts_dir = f"{info['script_dir']}/runscripts/"
+    runscripts_dir = get_runscripts_dir()
     this_computer = info["this_computer"]
     if not user_choice:
         not_answered = True
@@ -915,13 +915,13 @@ def save_files(scripts_info, info, user_choice):
                             f"{last_tested_dir}/{this_computer}/{sp_t}",
                         )
     # Load current state
-    with open(f"{info['script_dir']}/state.yaml", "r") as st:
+    with open(get_state_yaml_path(), "r") as st:
         current_state = yaml.load(st, Loader=yaml.FullLoader)
     # Update with this results
     results = format_results(info, scripts_info)
     current_state = deep_update(current_state, results)
     current_state = sort_dict(current_state)
-    with open(f"{info['script_dir']}/state.yaml", "w") as st:
+    with open(get_state_yaml_path(), "w") as st:
         state = yaml.dump(current_state)
         st.write(state)
 
@@ -951,7 +951,7 @@ def print_results(results):
                     logger.info(
                         f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
                     )
-    logger.info("")
+    logger.info(f"{colorama.Fore.WHITE}")
     logger.info("")
 
 

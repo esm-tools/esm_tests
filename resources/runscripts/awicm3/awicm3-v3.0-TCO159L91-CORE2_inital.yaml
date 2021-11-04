@@ -30,6 +30,8 @@ fesom:
             rnproc: 192
         ollie:
             rnproc: 144
+        mistral:
+            rnproc: 144
     nproc: ${rnproc}
     restart_rate: 1
     restart_unit: "d"
@@ -55,6 +57,8 @@ oifs:
             rnproc: 18
         juwels:
             rnproc: 32
+        mistral:
+            rnproc: 24
     nproc: ${rnproc}
     omp_num_threads: 6
 

@@ -30,6 +30,8 @@ fesom:
             rnproc: 192
         ollie:
             rnproc: 144
+        mistral:
+            rnproc: 144
     nproc: ${rnproc}
     restart_rate: 1
     restart_unit: "d"
@@ -53,7 +55,8 @@ oifs:
     choose_computer.name:
         ollie:
             rnproc: 72
-            shit: 1
+        mistral:
+            rnproc: 72
         juwels:
             rnproc: 96
     nproc: ${rnproc}

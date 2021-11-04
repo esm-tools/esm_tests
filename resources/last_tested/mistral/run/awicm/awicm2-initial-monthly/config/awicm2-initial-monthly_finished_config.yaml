@@ -186,6 +186,7 @@ echam:
         - 6.3.04p1-recom-awicm
         - 6.3.05p2-concurrent_radiation-paleodyn
         - 6.3.04p1
+        - 6.3.05p2-wiso
         branch: 6.3.04p1
         choose_version:
             6.3.02p4:
@@ -227,9 +228,10 @@ echam:
                 git-repository: https://git.geomar.de/foci/src/echam.git
             6.3.05p2-wiso:
                 branch: wiso
-                clean_command: make clean
-                comp_command: make; make install
-                conf_command: ./configure
+                clean_command: rm -rf src/echam/bin; rm -rf bin; make clean
+                comp_command: ./config/createMakefiles.pl; autoreconf -i --force; mkdir -p src/.deps yaxt/src/.deps yaxt/tests/.deps; ./configure $configure_opts --with-fortran=intel INSTALL='/usr/bin/install -p'; make -j `nproc --all`; make install -j `nproc --all`; mkdir -p src/echam/bin; cp  bin/echam6 src/echam/bin/echam6
+                destination: echam-6.3.05p2-wiso
+                git-repository: https://gitlab.awi.de/pgierz/echam6.git
         clean_command: rm -rf build CMakeCache.txt
         comp_command: mkdir -p build; cd build; cmake ..;   make install -j `nproc --all`
         git-repository: https://gitlab.dkrz.de/modular_esm/echam6.git
@@ -331,7 +333,7 @@ echam:
     experiment_restart_in_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/echam/
     experiment_restart_out_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/echam/
     experiment_viz_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/viz/echam/
-    file_movements: &id001
+    file_movements:
         analysis:
             exp_to_run: copy
             init_to_exp: copy
@@ -648,6 +650,8 @@ echam:
     lrad_async: false
     lrestart_from_old: false
     lresume: false
+    lwiso: false
+    lwiso_rerun: false
     metadata:
         Authors: Bjorn Stevens (bjorn.stevens@mpimet.mpg.de) among others at MPI-Met
         Description: The ECHAM atmosphere model, major version 6
@@ -695,6 +699,7 @@ echam:
     nprocb: 24
     nprocbr: 0
     npromar: 0
+    nwiso: 0
     ocean_resolution: CORE2
     other_date: '2000-01-31T23:52:30'
     outdata_intermediate:
@@ -1128,10 +1133,23 @@ echam:
     type: atmosphere
     value: echam switch
     version: 6.3.04p1
+    wiso_fields:
+    - o18w_atm
+    - hdow_atm
+    - o16w_atm
+    - o18i_atm
+    - hdoi_atm
+    - o16i_atm
+    - w1_atm
+    - w2_atm
+    - w3_atm
+    - i1_atm
+    - i2_atm
+    - i3_atm
     yr_perp_off: false
 fesom:
     add_namelist_changes:
-        namelist.oce: &id002
+        namelist.oce: &id001
             boundary:
                 restore_s_surf: 0
             oce_tra:
@@ -1246,7 +1264,82 @@ fesom:
     experiment_restart_in_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/fesom/
     experiment_restart_out_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/fesom/
     experiment_viz_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/viz/fesom/
-    file_movements: *id001
+    file_movements:
+        analysis:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        bin:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        config:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        couple:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        forcing:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        ignore:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        input:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        log:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        mon:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        outdata:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_in:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_out:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        scripts:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        unknown:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        viz:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
     forcing_data_dir: /pool/data/AWICM//FESOM2/FORCING/
     git-repository:
     - https://github.com/FESOM/fesom2.git
@@ -1314,7 +1407,7 @@ fesom:
                 nm_tair_file: /pool/data/AWICM//FESOM2/FORCING//t_10.
                 nm_xwind_file: /pool/data/AWICM//FESOM2/FORCING//u_10.
                 nm_ywind_file: /pool/data/AWICM//FESOM2/FORCING//v_10.
-        namelist.oce: *id002
+        namelist.oce: *id001
     namelist_dir: /mnt/lustre01/pf/a/a270152/esm_tools/namelists//fesom2/2.0/
     namelists:
     - namelist.config
@@ -1558,7 +1651,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 11191
+    jobid: 21789
     jobtype: prepcompute
     last_run_datestamp: 19991201-19991231
     last_run_in_chunk: false
@@ -1753,7 +1846,82 @@ hdmodel:
     experiment_restart_in_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/hdmodel/
     experiment_restart_out_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/hdmodel/
     experiment_viz_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/viz/hdmodel/
-    file_movements: *id001
+    file_movements:
+        analysis:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        bin:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        config:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        couple:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        forcing:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        ignore:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        input:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        log:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        mon:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        outdata:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_in:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_out:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        scripts:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        unknown:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        viz:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
     ini_parent_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/echam//../hdmodel/
     ini_parent_exp_id: awicm2-initial-monthly
     ini_restart_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/echam//../hdmodel/
@@ -1855,7 +2023,82 @@ jsbach:
     experiment_restart_in_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/jsbach/
     experiment_restart_out_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/jsbach/
     experiment_viz_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/viz/jsbach/
-    file_movements: *id001
+    file_movements:
+        analysis:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        bin:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        config:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        couple:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        forcing:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        ignore:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        input:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        log:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        mon:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        outdata:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_in:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_out:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        scripts:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        unknown:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        viz:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
     forcing_additional_information:
         LU:
         - need_timestep_before
@@ -2211,7 +2454,82 @@ oasis3mct:
     experiment_restart_in_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/oasis3mct/
     experiment_restart_out_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/restart/oasis3mct/
     experiment_viz_dir: /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/viz/oasis3mct/
-    file_movements: *id001
+    file_movements:
+        analysis:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        bin:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        config:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        couple:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        forcing:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        ignore:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        input:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        log:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        mon:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        outdata:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_in:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        restart_out:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        scripts:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        unknown:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
+        viz:
+            exp_to_run: copy
+            init_to_exp: copy
+            run_to_work: copy
+            work_to_run: copy
     git-repository: https://gitlab.dkrz.de/modular_esm/oasis3-mct.git
     install_libs:
     - build/lib/psmile/libpsmile.a

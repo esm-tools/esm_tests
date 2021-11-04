@@ -75,7 +75,7 @@ fesom:
     namelist_changes:
         namelist.config:
             geometry:
-                force_rotation: false
+                force_rotation: true
             paths:
                 # NOTE: This will be incorporated into the pool at a later stage
                 ClimateDataPath: ${general.CDP}

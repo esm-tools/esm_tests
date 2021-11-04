@@ -18,6 +18,9 @@ awicm3:
       juwels:
         compilation: true
         run: true
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
@@ -26,17 +29,26 @@ awicm3:
       juwels:
         compilation: true
         run: true
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
 awiesm:
   2.1-recom:
     all_awiesm-2.1-recom:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true
   2.1-wiso:
     PI_ctrl_awiesm-2.1-wiso:
+      mistral:
+        compilation: true
+        run: true
       ollie:
         compilation: true
         run: true

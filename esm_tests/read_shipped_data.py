@@ -31,6 +31,14 @@ def get_state_yaml():
         pkg_resources.resource_string("esm_tests.resources", "state.yaml")
     )
 
+# State YAML path:
+def get_state_yaml_path():
+    if EDITABLE_INSTALL:
+        return pkg_resources.resource_filename("resources", f"state.yaml")
+    return yaml.safe_load(
+        pkg_resources.resource_filename("esm_tests.resources", "state.yaml")
+    )
+
 
 # Ignore Compare YAML:
 def get_ignore_compare_yaml():
@@ -48,6 +56,12 @@ def get_last_tested(f):
     if EDITABLE_INSTALL:
         return pkg_resources.resource_string("resources", f"last_tested/{f}")
     return pkg_resources.resource_string("esm_tests.resources", f"last_tested/{f}")
+
+# Last Tested dir:
+def get_last_tested_dir():
+    if EDITABLE_INSTALL:
+        return pkg_resources.resource_filename("resources", f"last_tested/")
+    return pkg_resources.resource_filename("esm_tests.resources", f"last_tested/")
 
 
 # Runscripts:

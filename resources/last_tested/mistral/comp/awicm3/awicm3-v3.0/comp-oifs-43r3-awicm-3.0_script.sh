@@ -93,6 +93,6 @@ export DR_HOOK_IGNORE_SIGNALS=-1
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
 
-cd rnfmap
-rm -rf bin; mkdir bin; cd src; make ; cd .. ; cp bin/rnfmap.exe ./bin/rnfma
+cd oifs-43r3
+export OIFS_TOPLEVEL_DIR=/mnt/lustre02/work/ab0995/a270152/testing/comp/awicm3/awicm3-v3.0/oifs-43r3; cd make; ../fcm/bin/fcm make -v -j8 -f oifs.cfg ; mv esm/oifs/bin/master.exe esm/oifs/bin/oifs
 cd ..

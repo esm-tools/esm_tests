@@ -513,18 +513,25 @@ fesom:
     restart_first: 1
     restart_flag: last
     restart_in_in_workdir:
+        icb_restart: iceberg.restart
         ice_restart: fesom.2000.ice.restart.nc
         oce_restart: fesom.2000.oce.restart.nc
+        wiso_restart: fesom.2000.wiso.restart.nc
     restart_out_in_workdir:
+        icb_restart: iceberg.restart
         ice_restart: fesom.2001.ice.restart.nc
         oce_restart: fesom.2001.oce.restart.nc
+        wiso_restart: fesom.2001.wiso.restart.nc
     restart_out_intermediate:
+        icb_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/restart/fesom/iceberg.restart
         ice_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/restart/fesom/fesom.2001.ice.restart.nc
         oce_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/restart/fesom/fesom.2001.oce.restart.nc
     restart_out_sources:
+        icb_restart: /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/run_20010101-20010131/work//iceberg.restart
         ice_restart: /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/run_20010101-20010131/work//fesom.2001.ice.restart.nc
         oce_restart: /work/ab0995/a270152/testing//run/fesom//fesom2.1-initial-monthly/run_20010101-20010131/work//fesom.2001.oce.restart.nc
     restart_out_targets:
+        icb_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/restart/fesom/iceberg.restart
         ice_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/restart/fesom/fesom.2001.ice.restart.nc
         oce_restart: /work/ab0995/a270152/testing/run/fesom/fesom2.1-initial-monthly/restart/fesom/fesom.2001.oce.restart.nc
     restart_rate: 1
@@ -566,7 +573,21 @@ fesom:
     time_dimension: time
     time_step: 1800
     type: ocean
+    use_icebergs: false
     version: 2.1
+    wiso_fields:
+    - o18w_oce
+    - hdow_oce
+    - o16w_oce
+    - o18i_oce
+    - hdoi_oce
+    - o16i_oce
+    - w1_oce
+    - w2_oce
+    - w3_oce
+    - i1_oce
+    - i2_oce
+    - i3_oce
     with_part_format: false
     xwind_prefix: uas.
     yearnew: 2001
@@ -739,7 +760,7 @@ general:
     - restart_in
     initial_date: '2001-01-01T00:00:00'
     inspect: null
-    jobid: 3425
+    jobid: 15628
     jobtype: prepcompute
     last_run_datestamp: 20001201-20001231
     last_run_in_chunk: false

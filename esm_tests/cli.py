@@ -8,7 +8,7 @@ import argparse
 from loguru import logger
 
 from .esm_tests import *
-import esm_tests.read_shipped_data
+from .read_shipped_data import *
 
 import os
 import sys
@@ -17,7 +17,7 @@ import sys
 def main():
     # Logger
     logger.remove()
-    logger.add(sys.stderr, format="{message}")
+    logger.add(sys.stderr, format="<level>{message}</level>")
     if os.environ.get("CI", False):
         logger.add("out.log", backtrace=True, diagnose=True)
 
@@ -86,7 +86,7 @@ def main():
     info["hold"] = args["hold"]
 
     info["script_dir"] = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-    info["last_tested_dir"] = f"{info['script_dir']}/last_tested/"
+    info["last_tested_dir"] = get_last_tested_dir()
     info["this_computer"] = (
         determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
     )
@@ -96,11 +96,7 @@ def main():
 
     # Print state if necessary
     if print_state:
-        try:
-            with open(f"{info['script_dir']}/state.yaml", "r") as st:
-                current_state = yaml.load(st, Loader=yaml.FullLoader)
-        except FileNotFoundError:
-            current_state = esm_tests.read_shipped_data.get_state_yaml()
+        current_state = get_state_yaml()
         print_results(current_state)
         sys.exit(1)
 
@@ -112,7 +108,7 @@ def main():
 
     # Define lines to be ignored during comparison
     try:
-        info["ignore"] = esm_tests.read_shipped_data.get_ignore_compare_yaml()
+        info["ignore"] = get_ignore_compare_yaml()
     except FileNotFoundError as e:
         print("Whoops, that did not work... I was looking here:")
         print(f"{info['script_dir']}/ignore_compare.yaml")
