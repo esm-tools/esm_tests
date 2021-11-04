@@ -927,19 +927,24 @@ def save_files(scripts_info, info, user_choice):
         st.write(state)
 
 
-def print_results(results):
+def print_results(results, info):
     colorama.init(autoreset=True)
+
+    if info.get("bulletpoints", False):
+        bp = "- "
+    else:
+        bp = ""
 
     logger.info("")
     logger.info("")
     logger.info(f"{bs}RESULTS{be}")
     logger.info("")
     for model, versions in results.items():
-        logger.info(f"{colorama.Fore.CYAN}{model}:")
+        logger.info(f"{bp}{colorama.Fore.CYAN}{model}:")
         for version, scripts in versions.items():
-            logger.info(f"    {colorama.Fore.MAGENTA}{version}:")
+            logger.info(f"    {bp}{colorama.Fore.MAGENTA}{version}:")
             for script, computers in scripts.items():
-                logger.info(f"        {colorama.Fore.WHITE}{script}:")
+                logger.info(f"        {bp}{colorama.Fore.WHITE}{script}:")
                 for computer, data in computers.items():
                     if data["compilation"]:
                         compilation = f"{colorama.Fore.GREEN}compiles"
@@ -950,7 +955,7 @@ def print_results(results):
                     else:
                         run = f"{colorama.Fore.RED}run failed"
                     logger.info(
-                        f"            {colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
+                        f"            {bp}{colorama.Fore.WHITE}{computer}:\t{compilation}\t{run}"
                     )
     logger.info(f"{colorama.Fore.WHITE}")
     logger.info("")

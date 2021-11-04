@@ -72,6 +72,13 @@ def main():
         help="Hold before operation, to give time to check the output",
         action="store_true",
     )
+    parser.add_argument(
+        "-b",
+        "--bulletpoints",
+        default=False,
+        help="bullet points for printing the results",
+        action="store_true",
+    )
 
     info = {}
 
@@ -90,6 +97,7 @@ def main():
     info["this_computer"] = (
         determine_computer_from_hostname().split("/")[-1].replace(".yaml", "")
     )
+    info["bulletpoints"] = args["bulletpoints"]
 
     # Predefined for later
     user_scripts = dict(comp={}, run={})
@@ -97,7 +105,7 @@ def main():
     # Print state if necessary
     if print_state:
         current_state = get_state_yaml()
-        print_results(current_state)
+        print_results(current_state, info)
         sys.exit(1)
 
     # Get user info for testing
@@ -138,7 +146,7 @@ def main():
     run_test(scripts_info, info)
 
     # Print results
-    print_results(format_results(info, scripts_info))
+    print_results(format_results(info, scripts_info), info)
 
     # Save files
     if save_flag == "Not defined":
