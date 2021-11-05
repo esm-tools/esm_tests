@@ -14,12 +14,14 @@ general:
 
     choose_computer.name:
         mistral:
+            fr: True
             fesom_mesh: "/pf/a/a270064/bb1029/AWIESM2.1-EXP/mesh_core2/"
             CDP: "/pf/a/a270108/fesom2_recom_config/input-for-awiesm/"
             RDP: "/pf/a/a270108/fesom2_recom_config/input-for-awiesm/"
             jP: "/pf/a/a270064/bb1029/AWIESM2.1-EXP/mesh_core2/tarfilesT63/input/jsbach/jsbach_T63CORE2_11tiles_5layers_1850.nc"
         ollie:
-            fesom_mesh: "/work/ollie/pool/FESOM/fesom2.0/meshes/mesh_CORE2_final/"
+            fr: False
+            fesom_mesh: "/work/ollie/dsidoren/input/fesom2.0/meshes/mesh_CORE2_finaltopo_mean/"
             CDP: "/work/ollie/mbutzin/fesom2/input/init/"
             RDP: "/work/ollie/mbutzin/fesom2/input/dust/pi-mesh/"
             jP: "/work/ollie/dsidoren/input/fesom2.0/meshes/mesh_CORE2_finaltopo_mean/tarfilesT63/input/jsbach/jsbach_T63CORE2_11tiles_5layers_1850.nc"
@@ -75,7 +77,7 @@ fesom:
     namelist_changes:
         namelist.config:
             geometry:
-                force_rotation: true
+                force_rotation: ${general.fr}
             paths:
                 # NOTE: This will be incorporated into the pool at a later stage
                 ClimateDataPath: ${general.CDP}

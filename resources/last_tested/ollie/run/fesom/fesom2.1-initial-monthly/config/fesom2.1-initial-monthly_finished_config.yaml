@@ -22,7 +22,7 @@ computer:
     cxx: mpiicpc
     debug_info:
         loaded_from_file:
-        - /home/ollie/mandresm/esm_tools/configs//machines/ollie.yaml
+        - /home/ollie/mandresm/esm_tools/configs/.//machines/ollie.yaml
     debugger: None
     debugger_flags_prelauncher: ''
     exclusive_flag: --exclusive
@@ -126,7 +126,7 @@ defaults:
     clean_command: rm -rf build CMakeCache.txt
     comp_command: mkdir -p build; cd build; cmake ..;   make install -j `nproc --all`
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//defaults/download_and_compile.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//defaults/download_and_compile.yaml
 fesom:
     AOMIP_drag_coeff: false
     Cd_atm_ice: 0.0012
@@ -182,14 +182,14 @@ fesom:
         io: /work/ollie/mandresm/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/config/fesom/namelist.io
         oce: /work/ollie/mandresm/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/config/fesom/namelist.oce
     config_sources:
-        config: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.config
-        cvmix: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.cvmix
+        config: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.config
+        cvmix: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.cvmix
         fesom.clock: /work/ollie/mandresm/testing//run/fesom//fesom2.1-initial-monthly/run_20010101-20010131/config/fesom//fesom.clock
-        forcing: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.forcing
-        ice: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.ice
-        icepack: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.icepack
-        io: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.io
-        oce: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1//namelist.oce
+        forcing: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.forcing
+        ice: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.ice
+        icepack: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.icepack
+        io: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.io
+        oce: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1//namelist.oce
     config_targets:
         config: /work/ollie/mandresm/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/work/namelist.config
         cvmix: /work/ollie/mandresm/testing/run/fesom/fesom2.1-initial-monthly/run_20010101-20010131/work/namelist.cvmix
@@ -240,7 +240,7 @@ fesom:
     daynew: 1
     debug_info:
         loaded_from_file:
-        - /home/ollie/mandresm/esm_tools/configs//components/fesom/fesom-2.1.yaml
+        - /home/ollie/mandresm/esm_tools/configs/.//components/fesom/fesom-2.1.yaml
     destination: fesom-2.1
     executable: fesom
     experiment_analysis_dir: /work/ollie/mandresm/testing//run/fesom//fesom2.1-initial-monthly/analysis/fesom/
@@ -445,7 +445,7 @@ fesom:
                 nm_ywind_var: vas
                 runoff_data_source: CORE2
                 sss_data_source: CORE2
-    namelist_dir: /home/ollie/mandresm/esm_tools/namelists//fesom2/2.1/
+    namelist_dir: /home/ollie/mandresm/esm_tools/namelists/.//fesom2/2.1/
     namelists:
     - namelist.config
     - namelist.forcing
@@ -627,10 +627,10 @@ general:
     compute_time: 00:08:00
     current_date: '2001-01-01T00:00:00'
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//defaults/general.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//defaults/general.yaml
     defaults.yaml:
         debug_info:
-            loaded_from_file: /home/ollie/mandresm/esm_tools/configs//esm_software/esm_runscripts/defaults.yaml
+            loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//esm_software/esm_runscripts/defaults.yaml
         per_model_defaults: {}
     delta_date:
     - 0
@@ -742,7 +742,7 @@ general:
     - restart_in
     initial_date: '2001-01-01T00:00:00'
     inspect: null
-    jobid: 119681
+    jobid: 121622
     jobtype: prepcompute
     last_run_datestamp: 20001201-20001231
     last_run_in_chunk: false

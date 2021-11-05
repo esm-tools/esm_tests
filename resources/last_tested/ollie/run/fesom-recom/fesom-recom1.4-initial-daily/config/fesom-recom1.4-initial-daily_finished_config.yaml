@@ -22,7 +22,7 @@ computer:
     cxx: mpiicpc
     debug_info:
         loaded_from_file:
-        - /home/ollie/mandresm/esm_tools/configs//machines/ollie.yaml
+        - /home/ollie/mandresm/esm_tools/configs/.//machines/ollie.yaml
     debugger: None
     debugger_flags_prelauncher: ''
     exclusive_flag: --exclusive
@@ -122,12 +122,12 @@ computer:
     useMPI: intelmpi
 debug_info:
     loaded_from_file:
-    - /home/ollie/mandresm/esm_tools/configs//setups/fesom-recom/fesom-recom.yaml
+    - /home/ollie/mandresm/esm_tools/configs/.//setups/fesom-recom/fesom-recom.yaml
 defaults:
     clean_command: rm -rf build CMakeCache.txt
     comp_command: mkdir -p build; cd build; cmake ..;   make install -j `nproc --all`
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//defaults/download_and_compile.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//defaults/download_and_compile.yaml
 fesom:
     12_step_outputs: []
     age_tracer_sy: 1958
@@ -183,12 +183,12 @@ fesom:
         ice: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/config/fesom/namelist.ice
         oce: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/config/fesom/namelist.oce
     config_sources:
-        config: /home/ollie/mandresm/esm_tools/namelists//fesom/namelist.config
-        diag: /home/ollie/mandresm/esm_tools/namelists//fesom/namelist.diag
+        config: /home/ollie/mandresm/esm_tools/namelists/.//fesom/namelist.config
+        diag: /home/ollie/mandresm/esm_tools/namelists/.//fesom/namelist.diag
         fesom.clock: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/run_19580101-19580101/config/fesom//fesom.clock
-        forcing: /home/ollie/mandresm/esm_tools/namelists//fesom/namelist.forcing
-        ice: /home/ollie/mandresm/esm_tools/namelists//fesom/namelist.ice
-        oce: /home/ollie/mandresm/esm_tools/namelists//fesom/namelist.oce
+        forcing: /home/ollie/mandresm/esm_tools/namelists/.//fesom/namelist.forcing
+        ice: /home/ollie/mandresm/esm_tools/namelists/.//fesom/namelist.ice
+        oce: /home/ollie/mandresm/esm_tools/namelists/.//fesom/namelist.oce
     config_targets:
         config: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/work/namelist.config
         diag: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/work/namelist.diag
@@ -322,7 +322,7 @@ fesom:
     - wo
     daynew: 1
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//components/fesom/fesom.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//components/fesom/fesom.yaml
     destination: fesom-1.4
     executable: fesom
     experiment_analysis_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/analysis/fesom/
@@ -542,7 +542,7 @@ fesom:
             viscdiff:
                 Kh0: 800
                 brine_rejection_param: false
-    namelist_dir: /home/ollie/mandresm/esm_tools/namelists//fesom
+    namelist_dir: /home/ollie/mandresm/esm_tools/namelists/.//fesom
     namelists:
     - namelist.config
     - namelist.forcing
@@ -1134,10 +1134,10 @@ general:
     coupled_setup: false
     current_date: '1958-01-01T00:00:00'
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//defaults/general.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//defaults/general.yaml
     defaults.yaml:
         debug_info:
-            loaded_from_file: /home/ollie/mandresm/esm_tools/configs//esm_software/esm_runscripts/defaults.yaml
+            loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//esm_software/esm_runscripts/defaults.yaml
         per_model_defaults: {}
     delta_date:
     - 0
@@ -1249,7 +1249,7 @@ general:
     - restart_in
     initial_date: '1958-01-01T00:00:00'
     inspect: null
-    jobid: 118265
+    jobid: 121961
     jobtype: prepcompute
     last_run_datestamp: 19571231-19571231
     last_run_in_chunk: false
@@ -1427,7 +1427,7 @@ recom:
     config_intermediate:
         recom: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/config/recom/namelist.recom
     config_sources:
-        recom: /home/ollie/mandresm/esm_tools/namelists//recom/namelist.recom
+        recom: /home/ollie/mandresm/esm_tools/namelists/.//recom/namelist.recom
     config_targets:
         recom: /work/ollie/mandresm/testing/run/fesom-recom/fesom-recom1.4-initial-daily/run_19580101-19580101/work/namelist.recom
     constant_CO2: true
@@ -1438,7 +1438,7 @@ recom:
     - slp
     data_path: /work/ollie/projects/MarESys/forcing/CORE2mesh/
     debug_info:
-        loaded_from_file: /home/ollie/mandresm/esm_tools/configs//components/recom/recom.yaml
+        loaded_from_file: /home/ollie/mandresm/esm_tools/configs/.//components/recom/recom.yaml
     destination: recom
     experiment_analysis_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/analysis/recom/
     experiment_bin_dir: /work/ollie/mandresm/testing//run/fesom-recom//fesom-recom1.4-initial-daily/bin/recom/
@@ -1631,7 +1631,7 @@ recom:
                 lastyearoffesomcycle: 1958
                 numofCO2cycles: 1
                 recom_restart: false
-    namelist_dir: /home/ollie/mandresm/esm_tools/namelists//recom
+    namelist_dir: /home/ollie/mandresm/esm_tools/namelists/.//recom
     namelists:
     - namelist.recom
     numofCO2cycles: 1
