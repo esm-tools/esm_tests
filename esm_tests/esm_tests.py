@@ -22,7 +22,7 @@ bs = "\033[1m"
 be = "\033[0m"
 
 # Define default files for comparisson
-compare_files = {"comp": ["comp-"], "run": [".sad", "finished_config", "namelists"]}
+compare_files = {"comp": ["comp-"], "run": [".run", "finished_config", "namelists"]}
 
 
 #######################################################################################
@@ -39,7 +39,7 @@ class Comparison:
         ----------
         test_file : str
             str representation (already opened and read in) of the file (e.g.
-            sad file, compilatoin script, namelist) which you want to check
+            run file, compilatoin script, namelist) which you want to check
         truth_file : str
             str representation of the file which is known to be a valid truth.
         """
@@ -62,9 +62,9 @@ class Comparison:
         For the relative truth path, we are reading from the package. So,
         assuming you want to use the following as your truth:
 
-        >>> truth_file = "ollie/run/awicm/awicm2-initial-monthly/scripts/awicm2-initial-monthly_compute_20000101 -20000131.sad"
+        >>> truth_file = "ollie/run/awicm/awicm2-initial-monthly/scripts/awicm2-initial-monthly_compute_20000101 -20000131.run"
 
-        This would check the sad file for a run of awicm using a awicm2
+        This would check the run file for a run of awicm using a awicm2
         initialization with monthly restarts which is run on the ollie HPC.
         """
         # get last tested (Truth)
@@ -708,8 +708,8 @@ def get_rel_paths_compare_files(info, cfile, this_test_dir):
                 subpaths.append(f"{this_test_dir}/{f}")
         if len(subpaths) == 0:
             logger.error("\t\tNo 'comp-*.sh' file found!")
-    elif cfile in [".sad", "finished_config"]:
-        files_to_folders = {".sad": "scripts", "finished_config": "config"}
+    elif cfile in [".run", "finished_config"]:
+        files_to_folders = {".run": "scripts", "finished_config": "config"}
         ctype = files_to_folders[cfile]
         ldir = os.listdir(f"{user_info['test_dir']}/{this_test_dir}")
         ldir.sort()

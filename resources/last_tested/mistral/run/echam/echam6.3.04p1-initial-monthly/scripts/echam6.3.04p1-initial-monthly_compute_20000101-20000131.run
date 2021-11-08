@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --partition=compute
 #SBATCH --time=00:15:00
-#SBATCH --ntasks=864
-#SBATCH --output=/work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/log/awicm2-initial-monthly_awicm_compute_20000101-20000131.log --error=/work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/log/awicm2-initial-monthly_awicm_compute_20000101-20000131.log
-#SBATCH --job-name=awicm2-initial-monthly
+#SBATCH --ntasks=576
+#SBATCH --output=/work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/log/echam6.3.04p1-initial-monthly_echam_compute_20000101-20000131.log --error=/work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/log/echam6.3.04p1-initial-monthly_echam_compute_20000101-20000131.log
+#SBATCH --job-name=echam6.3.04p1-initial-monthly
 #SBATCH --account=ab0995
 #SBATCH --mail-type=NONE
 #SBATCH --ntasks-per-core=1
@@ -61,11 +61,9 @@ export OMPI_MCA_coll=^ghc
 export OMPI_MCA_mtl_mxm_np=0
 export MXM_RDMA_PORTS=mlx5_0:1
 export MXM_LOG_LEVEL=FATAL
-export takenfrom=fesom2_run
-export taken2from=fesom2_ru
 export ACCOUNT=ab0995
-export ESM_TESTING_DIR=/work/ab0995/a270152/testing//run/awicm/
-export MODEL_DIR=/work/ab0995/a270152/testing//comp/awicm/awicm-2.0
+export ESM_TESTING_DIR=/work/ab0995/a270152/testing//run/echam/
+export MODEL_DIR=/work/ab0995/a270152/testing//comp/echam/echam-6.3.04p1
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
 
@@ -73,18 +71,18 @@ export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 7901 - start >> /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/log//awicm2-initial-monthly_awicm.log
+echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 36865 - start >> /work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/log//echam6.3.04p1-initial-monthly_echam.log
 
-cd /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/run_20000101-20000131/work/
+cd /work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/run_20000101-20000131/work/
 time srun -l --kill-on-bad-exit=1 --cpu_bind=cores --multi-prog hostfile_srun 2>&1 &
 
 # Call to esm_runscript to start subjobs:
 # ['tidy']
 process=$! 
 # Comment the following line if you don't want esm_runscripts to restart:
-cd /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/scripts/
-esm_runscripts awicm2-initial-monthly.yaml -e awicm2-initial-monthly -t observe_compute -p ${process} -s 20000101 -r 1 -v  --open-run
+cd /work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/scripts/
+esm_runscripts echam6.3.04p1-initial-monthly.yaml -e echam6.3.04p1-initial-monthly -t observe_compute -p ${process} -s 20000101 -r 1 -v  --open-run
 
-echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 7901 - done >> /work/ab0995/a270152/testing//run/awicm//awicm2-initial-monthly/log//awicm2-initial-monthly_awicm.log
+echo $(date +"%a %b  %e %T %Y") : compute 1 2000-01-01T00:00:00 36865 - done >> /work/ab0995/a270152/testing//run/echam//echam6.3.04p1-initial-monthly/log//echam6.3.04p1-initial-monthly_echam.log
 
 wait
