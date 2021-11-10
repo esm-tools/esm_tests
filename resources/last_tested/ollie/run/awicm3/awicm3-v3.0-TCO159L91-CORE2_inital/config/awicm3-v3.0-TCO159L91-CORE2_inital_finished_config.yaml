@@ -936,7 +936,7 @@ general:
     - restart_in
     initial_date: '2000-01-01T00:00:00'
     inspect: null
-    jobid: 164967
+    jobid: 159281
     jobtype: prepcompute
     last_run_datestamp: 19991231-19991231
     last_run_in_chunk: false
@@ -1194,7 +1194,7 @@ general:
                 order_in_cluster: concurrent
                 run_after: tidy
                 run_on_queue: smp
-                script: postprocessing.sh
+                script: postprocessing.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/outdata/oifs/ 20000101
                 script_dir: /home/ollie/mandresm/esm_tools/configs//setups/awicm3
                 subjob_cluster: postprocessing
                 submit_to_batch_system: true
@@ -2756,6 +2756,7 @@ oifs:
     nlev: 91
     nlon: 640
     nproc: 18
+    nrest_ind: ''
     nspecresmin: 160
     nx: 108160
     ny: 1
@@ -2764,7 +2765,7 @@ oifs:
     oasis_grid_name_l: L160
     oasis_grid_name_r: R160
     ocean_resolution: CORE2
-    omp_num_threads: 6
+    omp_num_threads: 2
     onepctco2: false
     orb_iyear: 2000
     orb_mode: variable_year
@@ -2813,9 +2814,9 @@ oifs:
     prepifs_startdate: '19820101'
     preprocess:
         preprocess_shell:
-            method: '/home/ollie/mandresm/esm_tools/configs//components/oifs/change_icm_date.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/run_20000101-20000101/input/oifs// awi3 awi3 20000101 20000101 1 0 108160 1; echo ''Run number for internal OpenIFS timekeeping: 1'''
+            method: '/home/ollie/mandresm/esm_tools/configs//components/oifs/change_icm_date.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/run_20000101-20000101/input/oifs// awi3 awi3 20000101 20000101 1 0 108160 1;  echo ''Run number for internal OpenIFS timekeeping: 1'''
             type: shell
-    preprocess_method: '/home/ollie/mandresm/esm_tools/configs//components/oifs/change_icm_date.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/run_20000101-20000101/input/oifs// awi3 awi3 20000101 20000101 1 0 108160 1; echo ''Run number for internal OpenIFS timekeeping: 1'''
+    preprocess_method: '/home/ollie/mandresm/esm_tools/configs//components/oifs/change_icm_date.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/run_20000101-20000101/input/oifs// awi3 awi3 20000101 20000101 1 0 108160 1;  echo ''Run number for internal OpenIFS timekeeping: 1'''
     prev_date: '1999-12-31T23:00:00'
     pseudo_initial_date: '2000-01-01T00:00:00'
     read_icmcl: 0
@@ -2932,6 +2933,7 @@ oifs:
     seconds_since_initial: 0
     setup_dir: /work/ollie/mandresm/testing//comp/awicm3/awicm3-v3.0
     simulation_length_seconds: 86400
+    slice_icml: ''
     source_days_string: -1
     source_ndays_wam: -1
     start_days_string: -1
@@ -2974,6 +2976,7 @@ oifs:
     with_nest1: false
     with_xios: false
     workflow:
+        next_run_triggered_by: tidy
         subjobs:
             postprocessing:
                 batch_or_shell: batch
@@ -2981,7 +2984,7 @@ oifs:
                 order_in_cluster: concurrent
                 run_after: tidy
                 run_on_queue: smp
-                script: postprocessing.sh
+                script: postprocessing.sh /work/ollie/mandresm/testing//run/awicm3//awicm3-v3.0-TCO159L91-CORE2_inital/outdata/oifs/ 20000101
                 script_dir: /home/ollie/mandresm/esm_tools/configs//setups/awicm3
                 submit_to_batch_system: true
     xml_dir: ''
