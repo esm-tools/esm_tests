@@ -65,5 +65,5 @@ export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
 
 cd oifs-43r3-v1
-export OIFS_TOPLEVEL_DIR=/scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1; export OIFS_XIOS=enable ; export OIFS_XIOS_DIR=/scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios ; export OIFS_XIOS_INCLUDE=-I//scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios/inc/ ; cd make; ../fcm/bin/fcm make -v -j8 -f oifs.fcm ; cp -p esm/oifs/bin/master.exe esm/oifs/bin/oifs
+export OIFS_TOPLEVEL_DIR=/scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1; export OIFS_XIOS=enable ; export OIFS_XIOS_DIR=/scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios ; export OIFS_XIOS_INCLUDE=-I//scratch/usr/hbkmandr/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios/inc/ ; cd make; ../fcm/bin/fcm make -v -j8 -f oifs.fcm ; mv esm/oifs/bin/master.exe esm/oifs/bin/oifs
 cd ..
