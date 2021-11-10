@@ -3,6 +3,11 @@ computer:
     accounting: true
     accounting_flag: --account=hbk00083
     actual_script_dir: <--methods.script_dir--
+    add_choose_heterogeneous_parallelization: &id001
+        false:
+            cpu_bind: cores
+        true:
+            cpu_bind: none
     additional_flags: ''
     batch_system: slurm
     cc: $CC
@@ -17,6 +22,7 @@ computer:
             frequency: 30
             message: 'SLURM ERROR: slurm endet with an error, exiting.'
             method: kill
+    choose_heterogeneous_parallelization: *id001
     compiler_mpi: intel2019_impi2019
     config_files:
         hostfile: hostfile_srun
@@ -230,6 +236,7 @@ echam:
                 compiler_mpi: intel2019_impi2019
             nesh:
                 compiler_mpi: intel2019_impi2019
+        iolibraries: geomar_libs
     config_intermediate:
         namelist.echam: /scratch/usr/hbkmandr/testing/run/foci/foci-initial-piCtl-test_daily_restart_lowcpu/run_18500101-18500101/config/echam/namelist.echam
     config_sources:
@@ -791,6 +798,7 @@ echam:
                 add_module_actions:
                 - source $I_MPI_ROOT/intel64/bin/mpivars.sh release_mt
                 compiler_mpi: intel2019_impi2019
+        iolibraries: geomar_libs
     scenario: PI-CTRL
     scenario_type: PI-CTRL
     setup_dir: /scratch/usr/hbkmandr/testing//comp/foci/foci-default
@@ -1011,7 +1019,7 @@ general:
     ini_string_parent_date: '1850-01-01'
     initial_date: '1850-01-01T00:00:00'
     inspect: null
-    jobid: 116298
+    jobid: 138329
     jobtype: prepcompute
     last_run_datestamp: 18491231-18491231
     last_run_in_chunk: false
@@ -2181,6 +2189,8 @@ oasis3mct:
     - 3
     - 4
     - 4.0-oifsdeck
+    - 4.0-awicm-frontiers
+    - 4.0-awicm-3.0
     branch: '2.8'
     cf_name_dir: /scratch/usr/hbkmandr/testing//comp/foci/foci-default/oasis
     clean_command: rm -rf build CMakeCache.txt include lib/libpsmile.a lib/libscrip.a lib/libmct.a lib/libmpeu.a
@@ -2655,7 +2665,7 @@ xios:
     bin_targets:
         server: /scratch/usr/hbkmandr/testing/run/foci/foci-initial-piCtl-test_daily_restart_lowcpu/run_18500101-18500101/work/xios.x
     branch: esm-tools
-    clean_command: rm -rf bin lib obj ppsrc
+    clean_command: rm -rf bin lib obj ppsrc cfg done etc flags inc tmp
     comp_command: export XIOS_TOPLEVEL=/scratch/usr/hbkmandr/testing//comp/foci/foci-default; ./make_xios --arch ESMTOOLS_generic_intel --netcdf_lib netcdf4_par --full  --job 24; cp bin/xios_server.exe bin/xios.x
     config_intermediate:
         domain_def: /scratch/usr/hbkmandr/testing/run/foci/foci-initial-piCtl-test_daily_restart_lowcpu/run_18500101-18500101/config/xios/domain_def.xml
@@ -2673,8 +2683,15 @@ xios:
         file_def: /scratch/usr/hbkmandr/testing/run/foci/foci-initial-piCtl-test_daily_restart_lowcpu/run_18500101-18500101/work/file_def.xml
         io_def: /scratch/usr/hbkmandr/testing/run/foci/foci-initial-piCtl-test_daily_restart_lowcpu/run_18500101-18500101/work/iodef.xml
     debug_info:
-        loaded_from_file: /home/hbkmandr/esm_tools/configs//components/xios/xios.yaml
+        loaded_from_file:
+        - /home/hbkmandr/esm_tools/configs//components/xios/xios.yaml
     destination: xios
+    environment_changes:
+        choose_computer.name:
+            ollie:
+                add_module_actions:
+                - unload netcdf
+                - load netcdf/4.4.1.1_intel_mpi
     executable: xios.x
     experiment_analysis_dir: /scratch/usr/hbkmandr/testing//run/foci//foci-initial-piCtl-test_daily_restart_lowcpu/analysis/xios/
     experiment_bin_dir: /scratch/usr/hbkmandr/testing//run/foci//foci-initial-piCtl-test_daily_restart_lowcpu/bin/xios/
