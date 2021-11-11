@@ -11,7 +11,7 @@ module load Python/3.6.8
 module load imkl/2019.3.199
 
 export LC_ALL=en_US.UTF-8
-export PROJECT=/p/project/hirace
+export TMPDIR=/tmp
 export FC=mpiifort
 export F77=mpiifort
 export MPIFC=mpiifort
@@ -20,7 +20,7 @@ export CC=mpiicc
 export CXX=mpiicpc
 export MPIROOT="$(mpiifort -show | perl -lne 'm{ -I(.*?)/include } and print $1')"
 export MPI_LIB="$(mpiifort -show |sed -e 's/^[^ ]*//' -e 's/-[I][^ ]*//g')"
-export IO_LIB_ROOT=$PROJECT/HPC_libraries/intel2019.3.199_impi2019.6.154_20200703
+export IO_LIB_ROOT=/p/project/hirace/HPC_libraries/intel2019.3.199_impi2019.6.154_20200703
 export PATH=$IO_LIB_ROOT/bin:$PATH
 export LD_LIBRARY_PATH=$IO_LIB_ROOT/lib:$LD_LIBRARY_PATH
 export SZIPROOT=$IO_LIB_ROOT

@@ -11,7 +11,7 @@ module load Python/3.8.5
 module load imkl/2020.2.254
 
 export LC_ALL=en_US.UTF-8
-export PROJECT=/p/project/hirace
+export TMPDIR=/tmp
 export FC=mpifort
 export F77=mpifort
 export MPIFC=mpifort
@@ -20,7 +20,7 @@ export CC=mpicc
 export CXX=mpic++
 export MPIROOT="$(mpifort -show | perl -lne 'm{ -I(.*?)/include } and print $1')"
 export MPI_LIB="$(mpifort -show |sed -e 's/^[^ ]*//' -e 's/-[I][^ ]*//g')"
-export IO_LIB_ROOT=$PROJECT/HPC_libraries/intel2020.2.254_parastation_5.4.7-1_20210427
+export IO_LIB_ROOT=/p/project/hirace/HPC_libraries/intel2020.2.254_parastation_5.4.7-1_20210427
 export PATH=$IO_LIB_ROOT/bin:$PATH
 export LD_LIBRARY_PATH=$IO_LIB_ROOT/lib:$LD_LIBRARY_PATH
 export SZIPROOT=$IO_LIB_ROOT
@@ -50,16 +50,16 @@ export OIFS_NETCDF_LIB="-L$NETCDFROOT/lib -lnetcdf"
 export OIFS_NETCDFF_INCLUDE="-I$NETCDFFROOT/include"
 export OIFS_NETCDFF_LIB="-L$NETCDFFROOT/lib -lnetcdff"
 export OIFS_FC=$FC
-export OIFS_FFLAGS="-r8 -fp-model precise -align array32byte -O1 -xCORE_AVX2 -g -traceback -convert big_endian -fpe0"
+export OIFS_FFLAGS="-r8 -fp-model precise -align array32byte -O1  -xCORE_AVX2 -g -traceback -convert big_endian -fpe0"
 export OIFS_FFIXED=""
 export OIFS_FCDEFS="BLAS LITTLE LINUX INTEGER_IS_INT"
-export OIFS_LFLAGS=$OIFS_MPI_LIB
+export OIFS_LFLAGS="$OIFS_MPI_LIB "
 export OIFS_CC=$CC
-export OIFS_CFLAGS="-fp-model precise -O1 -xCORE_AVX2 -g -traceback -qopt-report=0 -fpe0"
-export OIFS_CCDEFS="LINUX LITTLE INTEGER_IS_INT _ABI64 BLAS"
+export OIFS_CFLAGS="-fp-model precise -O1 -xCORE_AVX2 -g -traceback -qopt-report=0 -fpe0 "
+export OIFS_CCDEFS="LINUX LITTLE INTEGER_IS_INT _ABI64 BLAS "
 export ENVIRONMENT_SET_BY_ESMTOOLS=TRUE
 
 
 cd oifs-43r3-v1
-export OIFS_TOPLEVEL_DIR=/p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1; export OIFS_XIOS=enable ; export OIFS_XIOS_DIR=/p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios ; export OIFS_XIOS_INCLUDE=-I//p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios/inc/ ; cd make; ../fcm/bin/fcm make -v -j8 -f oifs.fcm ; cp -p esm/oifs/bin/master.exe esm/oifs/bin/oifs
+export OIFS_TOPLEVEL_DIR=/p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1; export OIFS_XIOS=enable ; export OIFS_XIOS_DIR=/p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios ; export OIFS_XIOS_INCLUDE=-I//p/scratch/chhb19/mandresm/testing/comp/oifs/oifs-43r3-v1/oifs-43r3-v1/../xios/inc/ ; cd make; ../fcm/bin/fcm make -v -j8 -f oifs.fcm ; mv esm/oifs/bin/master.exe esm/oifs/bin/oifs
 cd ..
