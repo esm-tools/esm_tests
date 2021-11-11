@@ -27,7 +27,7 @@ fesom:
         juwels:
             pool_dir: "/p/project/chhb19/jstreffi/input/fesom2/"
             mesh_dir: "${pool_dir}/core2/"
-            rnproc: 192
+            rnproc: 144
         ollie:
             rnproc: 144
     nproc: ${rnproc}

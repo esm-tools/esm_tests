@@ -11,7 +11,7 @@ module load Python/3.8.5
 module load imkl/2020.2.254
 
 export LC_ALL=en_US.UTF-8
-export PROJECT=/p/project/hirace
+export TMPDIR=/tmp
 export FC=mpifort
 export F77=mpifort
 export MPIFC=mpifort
@@ -20,7 +20,7 @@ export CC=mpicc
 export CXX=mpic++
 export MPIROOT="$(mpifort -show | perl -lne 'm{ -I(.*?)/include } and print $1')"
 export MPI_LIB="$(mpifort -show |sed -e 's/^[^ ]*//' -e 's/-[I][^ ]*//g')"
-export IO_LIB_ROOT=$PROJECT/HPC_libraries/intel2020.2.254_parastation_5.4.7-1_20210427
+export IO_LIB_ROOT=/p/project/hirace/HPC_libraries/intel2020.2.254_parastation_5.4.7-1_20210427
 export PATH=$IO_LIB_ROOT/bin:$PATH
 export LD_LIBRARY_PATH=$IO_LIB_ROOT/lib:$LD_LIBRARY_PATH
 export SZIPROOT=$IO_LIB_ROOT

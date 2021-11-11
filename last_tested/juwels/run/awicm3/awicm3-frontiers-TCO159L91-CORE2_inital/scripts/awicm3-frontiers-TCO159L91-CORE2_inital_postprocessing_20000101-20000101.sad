@@ -9,7 +9,7 @@
 #SBATCH --exclusive
 
 module --force purge
-module use /gpfs/software/juwels/otherstages
+module use $OTHERSTAGES
 module load Stages/2019a
 module load Intel/2019.5.281-GCC-8.3.0
 module load ParaStationMPI/5.4.4-1-mt
@@ -68,9 +68,9 @@ unset SLURM_ARBITRARY_NODELIST
 ulimit -s unlimited
 # 3...2...1...Liftoff!
 
-echo $(date +"%a %b  %e %T %Y") : postprocessing_oifs 1 2000-01-01T00:00:00 4503883 - start >> /p/scratch/chhb19/mandresm/testing//run/awicm3//awicm3-frontiers-TCO159L91-CORE2_inital/log//awicm3-frontiers-TCO159L91-CORE2_inital_awicm3.log
+echo $(date +"%a %b  %e %T %Y") : postprocessing_oifs 1 2000-01-01T00:00:00 4570789 - start >> /p/scratch/chhb19/mandresm/testing//run/awicm3//awicm3-frontiers-TCO159L91-CORE2_inital/log//awicm3-frontiers-TCO159L91-CORE2_inital_awicm3.log
 
 cd /p/scratch/chhb19/mandresm/testing//run/awicm3//awicm3-frontiers-TCO159L91-CORE2_inital/run_20000101-20000101/work/
-time srun -l /p/home/jusers/andres-martinez1/juwels/esm_tools/configs//setups/awicm3/postprocessing.sh 2>&1 &
+time srun -l /p/home/jusers/andres-martinez1/juwels/esm_tools/configs//setups/awicm3/postprocessing.sh /p/scratch/chhb19/mandresm/testing//run/awicm3//awicm3-frontiers-TCO159L91-CORE2_inital/outdata/oifs/ 20000101 2>&1 &
 
 wait
